@@ -41,13 +41,7 @@ function IconoInstagram() {
     >
       <rect x="3" y="3" width="18" height="18" rx="5" />
       <circle cx="12" cy="12" r="4" />
-      <circle
-        cx="17.5"
-        cy="6.5"
-        r="1"
-        fill="currentColor"
-        stroke="none"
-      />
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
     </svg>
   )
 }
@@ -146,8 +140,8 @@ export default function Home() {
       new Set(
         productos
           .map((p) => p.categoria)
-          .filter((c): c is string => !!c && c.trim() !== '')
-      )
+          .filter((c): c is string => !!c && c.trim() !== ''),
+      ),
     ).sort(),
   ]
 
@@ -191,12 +185,15 @@ export default function Home() {
 
   function dispararAnimacionAgregado(id: string) {
     setRecienAgregado(id)
-    setTimeout(() => setRecienAgregado(null), 500)
+
+    setTimeout(() => {
+      setRecienAgregado(null)
+    }, 500)
   }
 
   function manejarAgregar(producto: Producto) {
     const productoEnCarrito = items.find(
-      (item) => item.id === producto.id
+      (item) => item.id === producto.id,
     )
 
     if (!productoEnCarrito) {
@@ -350,10 +347,10 @@ export default function Home() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 items-stretch">
             {productosFiltrados.map((producto) => {
               const itemCarrito = items.find(
-                (item) => item.id === producto.id
+                (item) => item.id === producto.id,
               )
 
               const nuevo = esProductoNuevo(producto.created_at)
@@ -362,14 +359,14 @@ export default function Home() {
               return (
                 <div
                   key={producto.id}
-                  className={`group bg-white rounded-lg border border-[#E2E8F0] overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 ${
+                  className={`group bg-white rounded-lg border border-[#E2E8F0] overflow-hidden flex flex-col h-full hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 ${
                     animando ? 'ring-2 ring-[#12283F]' : ''
                   }`}
                 >
                   <button
                     type="button"
                     onClick={() => setProductoSeleccionado(producto)}
-                    className="w-full text-left cursor-pointer"
+                    className="w-full text-left cursor-pointer flex-1"
                     aria-label={`Ver detalles de ${producto.nombre}`}
                   >
                     <div className="h-0.5 bg-transparent group-hover:bg-[#1C3D5F] transition-colors" />
@@ -417,7 +414,7 @@ export default function Home() {
                     </div>
                   </button>
 
-                  <div className="px-4 pb-4">
+                  <div className="px-4 pb-4 mt-auto">
                     {!itemCarrito ? (
                       <button
                         type="button"
@@ -474,7 +471,7 @@ export default function Home() {
           onClick={cerrarDetalle}
         >
           <div
-            className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl"
+            className="relative w-full max-w-4xl max-h-90vh overflow-y-auto bg-white rounded-2xl shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -499,8 +496,10 @@ export default function Home() {
             </button>
 
             <div className="grid grid-cols-1 md:grid-cols-2">
-              <div className="bg-[#F5F7FA] min-h-80 md:min-h-130 flex items-center justify-center relative">
-                {esProductoNuevo(productoSeleccionado.created_at) && (
+              <div className="bg-[#F5F7FA] min-h-[320px] md:min-h-[520px] flex items-center justify-center relative">
+                {esProductoNuevo(
+                  productoSeleccionado.created_at,
+                ) && (
                   <span className="absolute top-4 left-4 bg-[#12283F] text-white text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded">
                     Nuevo
                   </span>
@@ -536,8 +535,7 @@ export default function Home() {
                 <div className="w-12 h-1 bg-[#12283F] mt-5 mb-6 rounded-full" />
 
                 <p className="text-[#12283F] text-2xl font-bold">
-                  $
-                  {productoSeleccionado.precio.toLocaleString('es-CO')}
+                  ${productoSeleccionado.precio.toLocaleString('es-CO')}
                 </p>
 
                 <div className="mt-7">
@@ -553,7 +551,7 @@ export default function Home() {
 
                 <div className="mt-auto pt-8">
                   {!items.find(
-                    (item) => item.id === productoSeleccionado.id
+                    (item) => item.id === productoSeleccionado.id,
                   ) ? (
                     <button
                       type="button"
@@ -571,7 +569,7 @@ export default function Home() {
                           type="button"
                           onClick={() =>
                             disminuirCantidad(
-                              productoSeleccionado.id
+                              productoSeleccionado.id,
                             )
                           }
                           className="w-14 h-12 flex items-center justify-center text-[#12283F] text-xl font-bold hover:bg-[#F5F7FA]"
@@ -588,7 +586,7 @@ export default function Home() {
                             {
                               items.find(
                                 (item) =>
-                                  item.id === productoSeleccionado.id
+                                  item.id === productoSeleccionado.id,
                               )?.cantidad
                             }
                           </span>
@@ -598,7 +596,7 @@ export default function Home() {
                           type="button"
                           onClick={() =>
                             aumentarCantidad(
-                              productoSeleccionado.id
+                              productoSeleccionado.id,
                             )
                           }
                           className="w-14 h-12 flex items-center justify-center text-[#12283F] text-xl font-bold hover:bg-[#F5F7FA]"
@@ -628,7 +626,7 @@ export default function Home() {
         <svg
           viewBox="0 0 1440 90"
           preserveAspectRatio="none"
-          className="w-full h-15 sm:h-22.5"
+          className="w-full h-15 sm:h-90px"
         >
           <path
             fill="#12283F"
@@ -652,14 +650,8 @@ export default function Home() {
 
             <p className="text-white/70 text-sm leading-relaxed">
               Somos una tienda de productos de{' '}
-              <span className="text-white font-medium">
-                Barbería
-              </span>
-              ,{' '}
-              <span className="text-white font-medium">
-                peluquería
-              </span>{' '}
-              y{' '}
+              <span className="text-white font-medium">Barbería</span>,{' '}
+              <span className="text-white font-medium">peluquería</span> y{' '}
               <span className="text-white font-medium">
                 cuidado personal
               </span>{' '}
@@ -713,10 +705,7 @@ export default function Home() {
               </li>
 
               <li>
-                Dirección{' '}
-                <span className="underline">
-                  Calle 8 #20-30
-                </span>
+                Dirección <span className="underline">Calle 8 #20-30</span>
               </li>
 
               <li>C.C Siete Mares Oficina 206-207</li>
@@ -772,8 +761,8 @@ export default function Home() {
             </h4>
 
             <p className="text-white/70 text-sm mb-3">
-              ¡Regístrate y mantente actualizado de nuevos
-              lanzamientos, promociones y eventos!
+              ¡Regístrate y mantente actualizado de nuevos lanzamientos,
+              promociones y eventos!
             </p>
 
             <form
