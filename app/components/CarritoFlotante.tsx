@@ -621,7 +621,7 @@ export default function CarritoFlotante() {
         <button
           type="button"
           onClick={abrirCarrito}
-          className="fixed bottom-5 right-5 z-40 flex items-center gap-3 bg-[#12283F] text-white px-5 py-3 rounded-full shadow-xl hover:bg-[#1C3D5F] transition-all"
+          className="fixed top-24 right-5 z-40 flex items-center gap-3 bg-[#12283F] text-white px-5 py-3 rounded-full shadow-xl hover:bg-[#1C3D5F] transition-all"
         >
 
           <svg

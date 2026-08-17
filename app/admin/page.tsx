@@ -104,6 +104,7 @@ function obtenerUltimos7Dias(): string[] {
 
   for (let i = 6; i >= 0; i--) {
     const fecha = new Date()
+
     fecha.setHours(0, 0, 0, 0)
     fecha.setDate(fecha.getDate() - i)
 
@@ -124,14 +125,45 @@ function formatearDiaCorto(fecha: string): string {
   })
 }
 
+function esPedidoCancelado(pedido: Pedido): boolean {
+  return (
+    String(pedido.estado || '')
+      .trim()
+      .toLowerCase() === 'cancelado'
+  )
+}
+
+function colorEstado(estado: string): string {
+  switch (
+    String(estado || '')
+      .trim()
+      .toLowerCase()
+  ) {
+    case 'pendiente':
+      return 'bg-amber-100 text-amber-800'
+
+    case 'confirmado':
+      return 'bg-blue-100 text-blue-800'
+
+    case 'entregado':
+      return 'bg-green-100 text-green-800'
+
+    case 'cancelado':
+      return 'bg-red-100 text-red-800'
+
+    default:
+      return 'bg-gray-100 text-gray-800'
+  }
+}
+
 export default function AdminPage() {
   const [products, setProducts] = useState<Producto[]>([])
   const [pedidos, setPedidos] = useState<Pedido[]>([])
   const [pedidoItems, setPedidoItems] = useState<PedidoItem[]>([])
 
-  const [loading, setLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState(false)
   const [loadingDashboard, setLoadingDashboard] =
-    useState<boolean>(true)
+    useState(true)
 
   const [togglingId, setTogglingId] =
     useState<string | null>(null)
@@ -140,19 +172,19 @@ export default function AdminPage() {
     useState<string | null>(null)
 
   const [mostrarForm, setMostrarForm] =
-    useState<boolean>(false)
+    useState(false)
 
   const [categorias, setCategorias] =
     useState<string[]>([])
 
   const [subiendoImagen, setSubiendoImagen] =
-    useState<boolean>(false)
+    useState(false)
 
   const [creandoCategoria, setCreandoCategoria] =
-    useState<boolean>(false)
+    useState(false)
 
   const [nuevaCategoria, setNuevaCategoria] =
-    useState<string>('')
+    useState('')
 
   const [formData, setFormData] =
     useState<FormData>({
@@ -164,35 +196,23 @@ export default function AdminPage() {
       activo: true,
     })
 
-  /*
-   * =========================================================
-   * DASHBOARD
-   * =========================================================
-   */
-
   const [ventasTotales, setVentasTotales] =
-    useState<number>(0)
+    useState(0)
 
   const [pedidosTotales, setPedidosTotales] =
-    useState<number>(0)
+    useState(0)
 
   const [pedidosPendientes, setPedidosPendientes] =
-    useState<number>(0)
+    useState(0)
 
   const [pedidosEntregados, setPedidosEntregados] =
-    useState<number>(0)
+    useState(0)
 
   const [ventas7Dias, setVentas7Dias] =
     useState<VentaDia[]>([])
 
   const [productosVendidos, setProductosVendidos] =
     useState<ProductoVendido[]>([])
-
-  /*
-   * =========================================================
-   * CARGA INICIAL
-   * =========================================================
-   */
 
   useEffect(() => {
     cargarTodo()
@@ -204,12 +224,6 @@ export default function AdminPage() {
       cargarDashboard(),
     ])
   }
-
-  /*
-   * =========================================================
-   * PRODUCTOS
-   * =========================================================
-   */
 
   const cargarProductos = async (): Promise<void> => {
     setLoading(true)
@@ -225,9 +239,9 @@ export default function AdminPage() {
         setProducts(data)
 
         const cats = data
-          .map((p: Producto) => p.categoria)
+          .map((p) => p.categoria)
           .filter(
-            (c: string | null): c is string =>
+            (c): c is string =>
               c !== null &&
               c.trim() !== ''
           )
@@ -237,33 +251,28 @@ export default function AdminPage() {
         )
       }
     } catch (error) {
-      console.error('Error cargando productos:', error)
+      console.error(
+        'Error cargando productos:',
+        error
+      )
     } finally {
       setLoading(false)
     }
   }
 
-  /*
-   * =========================================================
-   * DASHBOARD
-   * =========================================================
-   */
-
   const cargarDashboard = async (): Promise<void> => {
     setLoadingDashboard(true)
 
     try {
-      /*
-       * Pedidos
-       */
-
-      const { data: pedidosData, error: pedidosError } =
-        await supabase
-          .from('pedidos')
-          .select('*')
-          .order('created_at', {
-            ascending: false,
-          })
+      const {
+        data: pedidosData,
+        error: pedidosError,
+      } = await supabase
+        .from('pedidos')
+        .select('*')
+        .order('created_at', {
+          ascending: false,
+        })
 
       if (pedidosError) {
         console.error(
@@ -279,27 +288,29 @@ export default function AdminPage() {
       setPedidos(pedidosActuales)
 
       /*
-       * VENTAS
-       *
-       * Contamos todos los pedidos excepto
-       * los cancelados.
+       * SOLO LOS PEDIDOS NO CANCELADOS
+       * CUENTAN COMO VENTAS.
        */
-
       const pedidosValidos =
         pedidosActuales.filter(
           (pedido) =>
-            pedido.estado !== 'Cancelado'
+            !esPedidoCancelado(pedido)
         )
 
       const ventas =
         pedidosValidos.reduce(
           (total, pedido) =>
-            total + Number(pedido.total || 0),
+            total +
+            Number(pedido.total || 0),
           0
         )
 
       setVentasTotales(ventas)
 
+      /*
+       * Todos los pedidos siguen apareciendo
+       * en el contador general.
+       */
       setPedidosTotales(
         pedidosActuales.length
       )
@@ -307,21 +318,25 @@ export default function AdminPage() {
       setPedidosPendientes(
         pedidosActuales.filter(
           (pedido) =>
-            pedido.estado === 'Pendiente'
+            String(pedido.estado)
+              .trim()
+              .toLowerCase() ===
+            'pendiente'
         ).length
       )
 
       setPedidosEntregados(
         pedidosActuales.filter(
           (pedido) =>
-            pedido.estado === 'Entregado'
+            String(pedido.estado)
+              .trim()
+              .toLowerCase() ===
+            'entregado'
         ).length
       )
 
       /*
-       * =====================================================
        * VENTAS ÚLTIMOS 7 DÍAS
-       * =====================================================
        */
 
       const ultimos7Dias =
@@ -330,39 +345,49 @@ export default function AdminPage() {
       const resumen7Dias: VentaDia[] =
         ultimos7Dias.map((fecha) => {
           const pedidosDia =
-            pedidosValidos.filter((pedido) => {
-              const fechaPedido =
-                new Date(pedido.created_at)
-                  .toISOString()
-                  .split('T')[0]
+            pedidosValidos.filter(
+              (pedido) => {
+                const fechaPedido =
+                  new Date(
+                    pedido.created_at
+                  )
+                    .toISOString()
+                    .split('T')[0]
 
-              return fechaPedido === fecha
-            })
+                return (
+                  fechaPedido === fecha
+                )
+              }
+            )
 
           return {
             fecha,
-            total: pedidosDia.reduce(
-              (sum, pedido) =>
-                sum +
-                Number(pedido.total || 0),
-              0
-            ),
-            pedidos: pedidosDia.length,
+            total:
+              pedidosDia.reduce(
+                (sum, pedido) =>
+                  sum +
+                  Number(
+                    pedido.total || 0
+                  ),
+                0
+              ),
+            pedidos:
+              pedidosDia.length,
           }
         })
 
       setVentas7Dias(resumen7Dias)
 
       /*
-       * =====================================================
-       * ITEMS VENDIDOS
-       * =====================================================
+       * ITEMS
        */
 
-      const { data: itemsData, error: itemsError } =
-        await supabase
-          .from('pedido_items')
-          .select('*')
+      const {
+        data: itemsData,
+        error: itemsError,
+      } = await supabase
+        .from('pedido_items')
+        .select('*')
 
       if (itemsError) {
         console.error(
@@ -375,10 +400,32 @@ export default function AdminPage() {
       const items =
         (itemsData || []) as PedidoItem[]
 
-      setPedidoItems(items)
+      /*
+       * IDS DE PEDIDOS QUE NO ESTÁN CANCELADOS
+       */
+
+      const pedidosValidosIds =
+        new Set(
+          pedidosValidos.map(
+            (pedido) => pedido.id
+          )
+        )
 
       /*
-       * Crear ranking de productos.
+       * SOLAMENTE ESTOS ITEMS
+       * CUENTAN COMO VENDIDOS.
+       */
+      const itemsValidos =
+        items.filter((item) =>
+          pedidosValidosIds.has(
+            item.pedido_id
+          )
+        )
+
+      setPedidoItems(itemsValidos)
+
+      /*
+       * PRODUCTOS MÁS VENDIDOS
        */
 
       const ranking: Record<
@@ -386,7 +433,7 @@ export default function AdminPage() {
         ProductoVendido
       > = {}
 
-      items.forEach((item) => {
+      itemsValidos.forEach((item) => {
         const nombre =
           item.nombre_producto
 
@@ -409,7 +456,8 @@ export default function AdminPage() {
         Object.values(ranking)
           .sort(
             (a, b) =>
-              b.cantidad - a.cantidad
+              b.cantidad -
+              a.cantidad
           )
           .slice(0, 5)
 
@@ -426,12 +474,6 @@ export default function AdminPage() {
     }
   }
 
-  /*
-   * =========================================================
-   * TOGGLE PRODUCTO
-   * =========================================================
-   */
-
   const handleToggle = async (
     product: Producto
   ): Promise<void> => {
@@ -443,27 +485,28 @@ export default function AdminPage() {
       const nuevoEstado =
         !product.activo
 
-      const response = await fetch(
-        `/api/products/${product.id}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type':
-              'application/json',
-          },
-          body: JSON.stringify({
-            nombre: product.nombre,
-            descripcion:
-              product.descripcion || '',
-            precio: product.precio,
-            imagen_url:
-              product.imagen_url || '',
-            categoria:
-              product.categoria || '',
-            activo: nuevoEstado,
-          }),
-        }
-      )
+      const response =
+        await fetch(
+          `/api/products/${product.id}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type':
+                'application/json',
+            },
+            body: JSON.stringify({
+              nombre: product.nombre,
+              descripcion:
+                product.descripcion || '',
+              precio: product.precio,
+              imagen_url:
+                product.imagen_url || '',
+              categoria:
+                product.categoria || '',
+              activo: nuevoEstado,
+            }),
+          }
+        )
 
       if (response.ok) {
         await cargarProductos()
@@ -477,7 +520,7 @@ export default function AdminPage() {
               'Error desconocido')
         )
 
-        cargarProductos()
+        await cargarProductos()
       }
     } catch (error) {
       console.error(
@@ -492,12 +535,6 @@ export default function AdminPage() {
       setTogglingId(null)
     }
   }
-
-  /*
-   * =========================================================
-   * CREAR / EDITAR PRODUCTO
-   * =========================================================
-   */
 
   const handleSubmit = async (
     e: FormEvent<HTMLFormElement>
@@ -570,30 +607,22 @@ export default function AdminPage() {
           formData.activo,
       }
 
-      const res = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type':
-            'application/json',
-        },
-        body: JSON.stringify(datos),
-      })
+      const res = await fetch(
+        url,
+        {
+          method,
+          headers: {
+            'Content-Type':
+              'application/json',
+          },
+          body: JSON.stringify(
+            datos
+          ),
+        }
+      )
 
       if (res.ok) {
-        setFormData({
-          nombre: '',
-          descripcion: '',
-          precio: '',
-          imagen_url: '',
-          categoria: '',
-          activo: true,
-        })
-
-        setNuevaCategoria('')
-        setCreandoCategoria(false)
-        setEditingId(null)
-        setMostrarForm(false)
-
+        resetForm()
         await cargarProductos()
       } else {
         const error =
@@ -617,12 +646,6 @@ export default function AdminPage() {
     }
   }
 
-  /*
-   * =========================================================
-   * EDITAR
-   * =========================================================
-   */
-
   const handleEdit = (
     product: Producto
   ): void => {
@@ -636,9 +659,10 @@ export default function AdminPage() {
       nombre: product.nombre,
       descripcion:
         product.descripcion || '',
-      precio: formatearConPuntos(
-        String(product.precio)
-      ),
+      precio:
+        formatearConPuntos(
+          String(product.precio)
+        ),
       imagen_url:
         product.imagen_url || '',
       categoria:
@@ -651,12 +675,6 @@ export default function AdminPage() {
       behavior: 'smooth',
     })
   }
-
-  /*
-   * =========================================================
-   * ELIMINAR
-   * =========================================================
-   */
 
   const handleDelete = async (
     id: string
@@ -686,15 +704,11 @@ export default function AdminPage() {
       }
     } catch (error) {
       console.error(error)
-      alert('Error al eliminar')
+      alert(
+        'Error al eliminar'
+      )
     }
   }
-
-  /*
-   * =========================================================
-   * INPUTS
-   * =========================================================
-   */
 
   const handleInputChange = (
     e: ChangeEvent<
@@ -732,12 +746,6 @@ export default function AdminPage() {
     }))
   }
 
-  /*
-   * =========================================================
-   * IMAGEN
-   * =========================================================
-   */
-
   const handleImagenChange = async (
     e: ChangeEvent<HTMLInputElement>
   ): Promise<void> => {
@@ -752,7 +760,10 @@ export default function AdminPage() {
       const nombreArchivo =
         `${Date.now()}-${file.name}`
 
-      const { data, error } =
+      const {
+        data,
+        error,
+      } =
         await supabase.storage
           .from(
             'productos-fotos'
@@ -771,7 +782,9 @@ export default function AdminPage() {
         return
       }
 
-      const { data: urlData } =
+      const {
+        data: urlData,
+      } =
         supabase.storage
           .from(
             'productos-fotos'
@@ -787,6 +800,7 @@ export default function AdminPage() {
       }))
     } catch (error) {
       console.error(error)
+
       alert(
         'Error subiendo la imagen'
       )
@@ -802,12 +816,6 @@ export default function AdminPage() {
       imagen_url: '',
     }))
   }
-
-  /*
-   * =========================================================
-   * RESET
-   * =========================================================
-   */
 
   const resetForm = (): void => {
     setEditingId(null)
@@ -825,12 +833,6 @@ export default function AdminPage() {
       activo: true,
     })
   }
-
-  /*
-   * =========================================================
-   * ESTADÍSTICAS
-   * =========================================================
-   */
 
   const productosActivos =
     products.filter(
@@ -856,17 +858,10 @@ export default function AdminPage() {
       ventas7Dias.length - 1
     ]?.pedidos || 0
 
-  /*
-   * =========================================================
-   * RENDER
-   * =========================================================
-   */
-
   return (
     <div className="min-h-screen bg-[#F5F7FA]">
-      {/* ================================================== */}
+
       {/* HEADER */}
-      {/* ================================================== */}
 
       <header className="bg-white border-b border-[#E2E8F0] px-6 md:px-10 py-6 flex items-center gap-5">
         <div className="relative h-16 w-16 shrink-0">
@@ -904,17 +899,12 @@ export default function AdminPage() {
         </Link>
       </header>
 
-      {/* ================================================== */}
-      {/* CONTENIDO */}
-      {/* ================================================== */}
-
       <div className="max-w-7xl mx-auto p-6 md:p-10">
 
-        {/* ================================================== */}
         {/* DASHBOARD */}
-        {/* ================================================== */}
 
         <section className="mb-12">
+
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div>
               <h2 className="text-2xl font-bold text-[#12283F]">
@@ -946,11 +936,9 @@ export default function AdminPage() {
             </div>
           ) : (
             <>
-              {/* TARJETAS PRINCIPALES */}
+              {/* TARJETAS */}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-
-                {/* VENTAS */}
 
                 <div className="bg-[#12283F] text-white rounded-xl p-5 shadow-sm">
                   <div className="flex items-start justify-between">
@@ -975,8 +963,6 @@ export default function AdminPage() {
                     Pedidos no cancelados
                   </p>
                 </div>
-
-                {/* PEDIDOS */}
 
                 <Link
                   href="/admin/pedidos"
@@ -1003,8 +989,6 @@ export default function AdminPage() {
                   </p>
                 </Link>
 
-                {/* PENDIENTES */}
-
                 <Link
                   href="/admin/pedidos"
                   className="bg-white rounded-xl border border-[#E2E8F0] p-5 shadow-sm hover:shadow-md hover:border-[#CBD5E1] transition-all"
@@ -1030,8 +1014,6 @@ export default function AdminPage() {
                   </p>
                 </Link>
 
-                {/* ENTREGADOS */}
-
                 <div className="bg-white rounded-xl border border-[#E2E8F0] p-5 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div>
@@ -1054,8 +1036,6 @@ export default function AdminPage() {
                   </p>
                 </div>
 
-                {/* PRODUCTOS */}
-
                 <div className="bg-white rounded-xl border border-[#E2E8F0] p-5 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div>
@@ -1077,13 +1057,14 @@ export default function AdminPage() {
                     Disponibles en la tienda
                   </p>
                 </div>
+
               </div>
 
               {/* SEGUNDA FILA */}
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-5">
 
-                {/* VENTAS 7 DÍAS */}
+                {/* GRÁFICA */}
 
                 <div className="lg:col-span-2 bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-sm">
                   <div className="flex items-start justify-between mb-6">
@@ -1120,7 +1101,9 @@ export default function AdminPage() {
 
                         return (
                           <div
-                            key={dia.fecha}
+                            key={
+                              dia.fecha
+                            }
                             className="flex-1 h-full flex flex-col justify-end items-center gap-2"
                           >
                             <div className="text-[10px] font-semibold text-[#64748B]">
@@ -1210,27 +1193,22 @@ export default function AdminPage() {
                             }
                           >
                             <div className="flex items-center gap-3">
-                              <div className="w-7 h-7 rounded-full bg-[#F5F7FA] flex items-center justify-center text-xs font-bold text-[#12283F]">
-                                {index +
-                                  1}
+                              <div className="w-7 h-7 shrink-0 rounded-full bg-[#F5F7FA] flex items-center justify-center text-xs font-bold text-[#12283F]">
+                                {index + 1}
                               </div>
 
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-semibold text-[#12283F] truncate">
-                                  {
-                                    producto.nombre
-                                  }
+                                  {producto.nombre}
                                 </p>
 
                                 <p className="text-xs text-[#94A3B8]">
-                                  {
-                                    producto.cantidad
-                                  }{' '}
+                                  {producto.cantidad}{' '}
                                   vendidos
                                 </p>
                               </div>
 
-                              <p className="text-xs font-bold text-[#12283F]">
+                              <p className="text-xs font-bold text-[#12283F] shrink-0">
                                 {formatearPrecio(
                                   producto.ventas
                                 )}
@@ -1291,23 +1269,12 @@ export default function AdminPage() {
                 ) : (
                   <div className="overflow-x-auto">
                     <div className="min-w-[650px]">
+
                       <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr] gap-4 px-4 pb-3 border-b border-[#E2E8F0] text-[10px] uppercase tracking-wide font-bold text-[#94A3B8]">
-                        <span>
-                          Cliente
-                        </span>
-
-                        <span>
-                          Fecha
-                        </span>
-
-                        <span>
-                          Estado
-                        </span>
-
-                        <span>
-                          Total
-                        </span>
-
+                        <span>Cliente</span>
+                        <span>Fecha</span>
+                        <span>Estado</span>
+                        <span>Total</span>
                         <span className="text-right">
                           Acción
                         </span>
@@ -1317,9 +1284,7 @@ export default function AdminPage() {
                         {pedidos
                           .slice(0, 5)
                           .map(
-                            (
-                              pedido
-                            ) => (
+                            (pedido) => (
                               <div
                                 key={
                                   pedido.id
@@ -1347,21 +1312,9 @@ export default function AdminPage() {
                                 </p>
 
                                 <span
-                                  className={`inline-flex w-fit text-[10px] font-bold px-2.5 py-1 rounded-full ${
-                                    pedido.estado ===
-                                    'Pendiente'
-                                      ? 'bg-amber-100 text-amber-800'
-                                      : pedido.estado ===
-                                          'Confirmado'
-                                        ? 'bg-blue-100 text-blue-800'
-                                        : pedido.estado ===
-                                            'Entregado'
-                                          ? 'bg-green-100 text-green-800'
-                                          : pedido.estado ===
-                                              'Cancelado'
-                                            ? 'bg-red-100 text-red-800'
-                                            : 'bg-gray-100 text-gray-800'
-                                  }`}
+                                  className={`inline-flex w-fit text-[10px] font-bold px-2.5 py-1 rounded-full ${colorEstado(
+                                    pedido.estado
+                                  )}`}
                                 >
                                   {
                                     pedido.estado
@@ -1394,12 +1347,9 @@ export default function AdminPage() {
           )}
         </section>
 
-        {/* ================================================== */}
         {/* PRODUCTOS */}
-        {/* ================================================== */}
 
         <section>
-          {/* TÍTULO Y BOTONES */}
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
@@ -1433,9 +1383,7 @@ export default function AdminPage() {
                     resetForm()
                   } else {
                     resetForm()
-                    setMostrarForm(
-                      true
-                    )
+                    setMostrarForm(true)
                   }
                 }}
                 className="bg-[#12283F] text-white font-semibold px-5 py-2.5 rounded-lg hover:bg-[#1C3D5F] transition-colors shadow-sm"
@@ -1448,9 +1396,7 @@ export default function AdminPage() {
             </div>
           </div>
 
-          {/* ================================================== */}
           {/* FORMULARIO */}
-          {/* ================================================== */}
 
           {mostrarForm && (
             <div className="bg-white rounded-xl border border-[#E2E8F0] p-6 md:p-8 mb-10 shadow-sm">
@@ -1466,8 +1412,6 @@ export default function AdminPage() {
                 }
                 className="grid grid-cols-1 md:grid-cols-2 gap-5"
               >
-                {/* NOMBRE */}
-
                 <div>
                   <label className="block text-sm font-semibold text-[#334155] mb-1.5">
                     Nombre
@@ -1487,8 +1431,6 @@ export default function AdminPage() {
                     required
                   />
                 </div>
-
-                {/* CATEGORÍA */}
 
                 <div>
                   <label className="block text-sm font-semibold text-[#334155] mb-1.5">
@@ -1531,14 +1473,10 @@ export default function AdminPage() {
                       </option>
 
                       {categorias.map(
-                        (
-                          cat
-                        ) => (
+                        (cat) => (
                           <option
                             key={cat}
-                            value={
-                              cat
-                            }
+                            value={cat}
                           >
                             {cat}
                           </option>
@@ -1560,9 +1498,7 @@ export default function AdminPage() {
                           e
                         ) =>
                           setNuevaCategoria(
-                            e
-                              .target
-                              .value
+                            e.target.value
                           )
                         }
                         placeholder="Ej: Máquinas, Cuchillas, Shampoos..."
@@ -1588,8 +1524,6 @@ export default function AdminPage() {
                     </div>
                   )}
                 </div>
-
-                {/* PRECIO */}
 
                 <div>
                   <label className="block text-sm font-semibold text-[#334155] mb-1.5">
@@ -1617,8 +1551,6 @@ export default function AdminPage() {
                     />
                   </div>
                 </div>
-
-                {/* FOTO */}
 
                 <div>
                   <label className="block text-sm font-semibold text-[#334155] mb-1.5">
@@ -1681,8 +1613,6 @@ export default function AdminPage() {
                   />
                 </div>
 
-                {/* DESCRIPCIÓN */}
-
                 <div className="md:col-span-2">
                   <label className="block text-sm font-semibold text-[#334155] mb-1.5">
                     Descripción
@@ -1701,8 +1631,6 @@ export default function AdminPage() {
                     rows={3}
                   />
                 </div>
-
-                {/* BOTONES */}
 
                 <div className="md:col-span-2 flex gap-3 pt-2">
                   <button
@@ -1734,9 +1662,7 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* ================================================== */}
           {/* PRODUCTOS */}
-          {/* ================================================== */}
 
           {loading &&
           products.length === 0 ? (
@@ -1749,24 +1675,24 @@ export default function AdminPage() {
               Aún no hay productos cargados.
             </p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 items-stretch">
+
               {products.map(
-                (
-                  product
-                ) => (
+                (product) => (
                   <div
                     key={
                       product.id
                     }
-                    className={`bg-white rounded-xl border overflow-hidden shadow-sm hover:shadow-md transition-shadow ${
+                    className={`bg-white rounded-xl border overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col h-full ${
                       product.activo
                         ? 'border-[#E2E8F0]'
                         : 'border-[#E2E8F0] opacity-60'
                     }`}
                   >
+
                     {/* IMAGEN */}
 
-                    <div className="aspect-square bg-[#F5F7FA] relative overflow-hidden">
+                    <div className="aspect-square bg-[#F5F7FA] relative overflow-hidden shrink-0">
                       {product.imagen_url ? (
                         <img
                           src={
@@ -1790,32 +1716,36 @@ export default function AdminPage() {
                       )}
                     </div>
 
-                    {/* INFO */}
+                    {/* INFORMACIÓN */}
 
-                    <div className="p-4">
-                      {product.categoria && (
-                        <p className="text-[#94A3B8] text-[10px] font-bold uppercase tracking-wider mb-1">
-                          {
-                            product.categoria
-                          }
-                        </p>
-                      )}
+                    <div className="p-4 flex flex-col flex-1">
 
-                      <h3 className="font-bold text-[#12283F] text-sm leading-snug">
-                        {
-                          product.nombre
-                        }
-                      </h3>
-
-                      <p className="text-[#12283F] font-extrabold text-lg mt-1">
-                        {formatearPrecio(
-                          product.precio
+                      <div className="min-h-[76px]">
+                        {product.categoria && (
+                          <p className="text-[#94A3B8] text-[10px] font-bold uppercase tracking-wider mb-1 truncate">
+                            {
+                              product.categoria
+                            }
+                          </p>
                         )}
-                      </p>
+
+                        <h3 className="font-bold text-[#12283F] text-sm leading-snug line-clamp-2 min-h-[40px]">
+                          {
+                            product.nombre
+                          }
+                        </h3>
+
+                        <p className="text-[#12283F] font-extrabold text-lg mt-1">
+                          {formatearPrecio(
+                            product.precio
+                          )}
+                        </p>
+                      </div>
 
                       {/* CONTROLES */}
 
-                      <div className="mt-4 pt-4 border-t border-[#E2E8F0] space-y-3">
+                      <div className="mt-auto pt-4 border-t border-[#E2E8F0] space-y-3">
+
                         <div className="flex items-center gap-2">
                           <button
                             type="button"
@@ -1875,11 +1805,13 @@ export default function AdminPage() {
                             Eliminar
                           </button>
                         </div>
+
                       </div>
                     </div>
                   </div>
                 )
               )}
+
             </div>
           )}
         </section>
