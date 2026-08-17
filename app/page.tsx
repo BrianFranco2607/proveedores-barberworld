@@ -41,7 +41,13 @@ function IconoInstagram() {
     >
       <rect x="3" y="3" width="18" height="18" rx="5" />
       <circle cx="12" cy="12" r="4" />
-      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+      <circle
+        cx="17.5"
+        cy="6.5"
+        r="1"
+        fill="currentColor"
+        stroke="none"
+      />
     </svg>
   )
 }
@@ -73,6 +79,7 @@ function esProductoNuevo(fecha: string): boolean {
   const creado = new Date(fecha).getTime()
   const ahora = Date.now()
   const dias = (ahora - creado) / (1000 * 60 * 60 * 24)
+
   return dias <= 7
 }
 
@@ -80,6 +87,7 @@ function SkeletonCard() {
   return (
     <div className="bg-white rounded-lg border border-[#E2E8F0] overflow-hidden animate-pulse">
       <div className="aspect-square bg-[#E2E8F0]" />
+
       <div className="p-4">
         <div className="h-2.5 w-16 bg-[#E2E8F0] rounded mb-2" />
         <div className="h-3.5 w-full bg-[#E2E8F0] rounded mb-2" />
@@ -94,8 +102,12 @@ function SkeletonCard() {
 export default function Home() {
   const supabase = createClient()
 
-  const { items, agregarProducto, aumentarCantidad, disminuirCantidad } =
-    useCart()
+  const {
+    items,
+    agregarProducto,
+    aumentarCantidad,
+    disminuirCantidad,
+  } = useCart()
 
   const [productos, setProductos] = useState<Producto[]>([])
   const [busqueda, setBusqueda] = useState('')
@@ -107,7 +119,8 @@ export default function Home() {
   const [productoSeleccionado, setProductoSeleccionado] =
     useState<Producto | null>(null)
 
-  const [politicaAbierta, setPoliticaAbierta] = useState<ClavePolitica>(null)
+  const [politicaAbierta, setPoliticaAbierta] =
+    useState<ClavePolitica>(null)
 
   useEffect(() => {
     async function cargarProductos() {
@@ -155,9 +168,21 @@ export default function Home() {
   ]
 
   const redesSociales = [
-    { nombre: 'Facebook', url: REDES_SOCIALES.facebook, icono: <IconoFacebook /> },
-    { nombre: 'Instagram', url: REDES_SOCIALES.instagram, icono: <IconoInstagram /> },
-    { nombre: 'TikTok', url: REDES_SOCIALES.tiktok, icono: <IconoTiktok /> },
+    {
+      nombre: 'Facebook',
+      url: REDES_SOCIALES.facebook,
+      icono: <IconoFacebook />,
+    },
+    {
+      nombre: 'Instagram',
+      url: REDES_SOCIALES.instagram,
+      icono: <IconoInstagram />,
+    },
+    {
+      nombre: 'TikTok',
+      url: REDES_SOCIALES.tiktok,
+      icono: <IconoTiktok />,
+    },
   ]
 
   function cerrarDetalle() {
@@ -170,7 +195,9 @@ export default function Home() {
   }
 
   function manejarAgregar(producto: Producto) {
-    const productoEnCarrito = items.find((item) => item.id === producto.id)
+    const productoEnCarrito = items.find(
+      (item) => item.id === producto.id
+    )
 
     if (!productoEnCarrito) {
       agregarProducto({
@@ -179,12 +206,14 @@ export default function Home() {
         precio: producto.precio,
         imagen_url: producto.imagen_url,
       })
+
       dispararAnimacionAgregado(producto.id)
     }
   }
 
   function manejarAgregarDesdeDetalle() {
     if (!productoSeleccionado) return
+
     manejarAgregar(productoSeleccionado)
   }
 
@@ -193,7 +222,6 @@ export default function Home() {
     setCategoriaActiva('Todas')
   }
 
-  // Función para abrir el modal de políticas
   function abrirPolitica(tipo: ClavePolitica) {
     setPoliticaAbierta(tipo)
   }
@@ -204,7 +232,10 @@ export default function Home() {
       <div className="bg-[#12283F] text-white text-xs tracking-wide overflow-hidden whitespace-nowrap py-2">
         <div className="flex animate-marquee w-max">
           {[...Array(6)].map((_, i) => (
-            <span key={i} className="flex items-center mx-8 opacity-90">
+            <span
+              key={i}
+              className="flex items-center mx-8 opacity-90"
+            >
               {mensajesTicker[i % mensajesTicker.length]}
               <span className="mx-8 opacity-50">•</span>
             </span>
@@ -295,16 +326,19 @@ export default function Home() {
         ) : productosFiltrados.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center py-24">
             <IconoBusquedaVacia />
+
             <p className="text-[#334155] font-semibold text-sm mt-4">
               {productos.length === 0
                 ? 'Aún no hay productos cargados.'
                 : 'No encontramos productos con ese filtro'}
             </p>
+
             {productos.length > 0 && (
               <>
                 <p className="text-[#94A3B8] text-xs mt-1">
                   Prueba con otra palabra o revisa otra categoría.
                 </p>
+
                 <button
                   type="button"
                   onClick={limpiarFiltros}
@@ -318,7 +352,10 @@ export default function Home() {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
             {productosFiltrados.map((producto) => {
-              const itemCarrito = items.find((item) => item.id === producto.id)
+              const itemCarrito = items.find(
+                (item) => item.id === producto.id
+              )
+
               const nuevo = esProductoNuevo(producto.created_at)
               const animando = recienAgregado === producto.id
 
@@ -343,6 +380,7 @@ export default function Home() {
                           Nuevo
                         </span>
                       )}
+
                       {producto.imagen_url ? (
                         <img
                           src={producto.imagen_url}
@@ -388,13 +426,17 @@ export default function Home() {
                           animando ? 'scale-95' : 'scale-100'
                         }`}
                       >
-                        {animando ? '✓ Agregado' : '+ Agregar al pedido'}
+                        {animando
+                          ? '✓ Agregado'
+                          : '+ Agregar al pedido'}
                       </button>
                     ) : (
                       <div className="flex items-center justify-between border border-[#E2E8F0] rounded-md overflow-hidden">
                         <button
                           type="button"
-                          onClick={() => disminuirCantidad(producto.id)}
+                          onClick={() =>
+                            disminuirCantidad(producto.id)
+                          }
                           className="w-10 h-9 flex items-center justify-center text-[#12283F] hover:bg-[#F5F7FA] font-bold"
                           aria-label={`Disminuir cantidad de ${producto.nombre}`}
                         >
@@ -407,7 +449,9 @@ export default function Home() {
 
                         <button
                           type="button"
-                          onClick={() => aumentarCantidad(producto.id)}
+                          onClick={() =>
+                            aumentarCantidad(producto.id)
+                          }
                           className="w-10 h-9 flex items-center justify-center text-[#12283F] hover:bg-[#F5F7FA] font-bold"
                           aria-label={`Aumentar cantidad de ${producto.nombre}`}
                         >
@@ -446,22 +490,27 @@ export default function Home() {
                 strokeWidth={2}
                 className="w-5 h-5"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 6l12 12M18 6L6 18"
+                />
               </svg>
             </button>
 
             <div className="grid grid-cols-1 md:grid-cols-2">
-              <div className="bg-[#F5F7FA] min-h-[320px] md:min-h-[520px] flex items-center justify-center relative">
+              <div className="bg-[#F5F7FA] min-h-80 md:min-h-130 flex items-center justify-center relative">
                 {esProductoNuevo(productoSeleccionado.created_at) && (
                   <span className="absolute top-4 left-4 bg-[#12283F] text-white text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded">
                     Nuevo
                   </span>
                 )}
+
                 {productoSeleccionado.imagen_url ? (
                   <img
                     src={productoSeleccionado.imagen_url}
                     alt={productoSeleccionado.nombre}
-                    className="w-full h-full max-h-[520px] object-contain"
+                    className="w-full h-full max-h-130 object-contain"
                   />
                 ) : (
                   <div className="text-[#94A3B8] text-sm uppercase tracking-wide">
@@ -487,7 +536,8 @@ export default function Home() {
                 <div className="w-12 h-1 bg-[#12283F] mt-5 mb-6 rounded-full" />
 
                 <p className="text-[#12283F] text-2xl font-bold">
-                  ${productoSeleccionado.precio.toLocaleString('es-CO')}
+                  $
+                  {productoSeleccionado.precio.toLocaleString('es-CO')}
                 </p>
 
                 <div className="mt-7">
@@ -502,7 +552,9 @@ export default function Home() {
                 </div>
 
                 <div className="mt-auto pt-8">
-                  {!items.find((item) => item.id === productoSeleccionado.id) ? (
+                  {!items.find(
+                    (item) => item.id === productoSeleccionado.id
+                  ) ? (
                     <button
                       type="button"
                       onClick={manejarAgregarDesdeDetalle}
@@ -517,7 +569,11 @@ export default function Home() {
                       <div className="flex items-center justify-between">
                         <button
                           type="button"
-                          onClick={() => disminuirCantidad(productoSeleccionado.id)}
+                          onClick={() =>
+                            disminuirCantidad(
+                              productoSeleccionado.id
+                            )
+                          }
                           className="w-14 h-12 flex items-center justify-center text-[#12283F] text-xl font-bold hover:bg-[#F5F7FA]"
                         >
                           −
@@ -529,13 +585,22 @@ export default function Home() {
                           </p>
 
                           <span className="text-lg font-semibold text-[#12283F]">
-                            {items.find((item) => item.id === productoSeleccionado.id)?.cantidad}
+                            {
+                              items.find(
+                                (item) =>
+                                  item.id === productoSeleccionado.id
+                              )?.cantidad
+                            }
                           </span>
                         </div>
 
                         <button
                           type="button"
-                          onClick={() => aumentarCantidad(productoSeleccionado.id)}
+                          onClick={() =>
+                            aumentarCantidad(
+                              productoSeleccionado.id
+                            )
+                          }
                           className="w-14 h-12 flex items-center justify-center text-[#12283F] text-xl font-bold hover:bg-[#F5F7FA]"
                         >
                           +
@@ -563,7 +628,7 @@ export default function Home() {
         <svg
           viewBox="0 0 1440 90"
           preserveAspectRatio="none"
-          className="w-full h-15 sm:h-[90px]"
+          className="w-full h-15 sm:h-22.5"
         >
           <path
             fill="#12283F"
@@ -587,11 +652,21 @@ export default function Home() {
 
             <p className="text-white/70 text-sm leading-relaxed">
               Somos una tienda de productos de{' '}
-              <span className="text-white font-medium">Barbería</span>,{' '}
-              <span className="text-white font-medium">peluquería</span> y{' '}
-              <span className="text-white font-medium">cuidado personal</span>{' '}
+              <span className="text-white font-medium">
+                Barbería
+              </span>
+              ,{' '}
+              <span className="text-white font-medium">
+                peluquería
+              </span>{' '}
+              y{' '}
+              <span className="text-white font-medium">
+                cuidado personal
+              </span>{' '}
               con más de{' '}
-              <span className="text-white font-medium">20 años de experiencia</span>{' '}
+              <span className="text-white font-medium">
+                20 años de experiencia
+              </span>{' '}
               en el mercado.
             </p>
 
@@ -619,7 +694,10 @@ export default function Home() {
             <ul className="text-white/70 text-sm space-y-2">
               <li>
                 Teléfono{' '}
-                <a href="tel:3223320949" className="underline hover:text-white">
+                <a
+                  href="tel:3223320949"
+                  className="underline hover:text-white"
+                >
                   3223320949
                 </a>
               </li>
@@ -635,7 +713,10 @@ export default function Home() {
               </li>
 
               <li>
-                Dirección <span className="underline">Calle 8 #20-30</span>
+                Dirección{' '}
+                <span className="underline">
+                  Calle 8 #20-30
+                </span>
               </li>
 
               <li>C.C Siete Mares Oficina 206-207</li>
@@ -643,7 +724,9 @@ export default function Home() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-sm uppercase tracking-wide mb-3">Políticas</h4>
+            <h4 className="font-semibold text-sm uppercase tracking-wide mb-3">
+              Políticas
+            </h4>
 
             <ul className="text-white/70 text-sm space-y-2">
               <li
@@ -652,24 +735,28 @@ export default function Home() {
               >
                 Información de contacto
               </li>
+
               <li
                 className="hover:text-white cursor-pointer"
                 onClick={() => abrirPolitica('privacidad')}
               >
                 Políticas de privacidad
               </li>
+
               <li
                 className="hover:text-white cursor-pointer"
                 onClick={() => abrirPolitica('reembolso')}
               >
                 Políticas de reembolso
               </li>
+
               <li
                 className="hover:text-white cursor-pointer"
                 onClick={() => abrirPolitica('envio')}
               >
                 Políticas de envío
               </li>
+
               <li
                 className="hover:text-white cursor-pointer"
                 onClick={() => abrirPolitica('terminos')}
@@ -685,7 +772,8 @@ export default function Home() {
             </h4>
 
             <p className="text-white/70 text-sm mb-3">
-              ¡Regístrate y mantente actualizado de nuevos lanzamientos, promociones y eventos!
+              ¡Regístrate y mantente actualizado de nuevos
+              lanzamientos, promociones y eventos!
             </p>
 
             <form
@@ -716,7 +804,9 @@ export default function Home() {
         </div>
 
         <div className="max-w-6xl mx-auto px-4 mt-8 pt-6 border-t border-white/10">
-          <p className="text-white/50 text-xs uppercase tracking-wide mb-3">Formas de pago</p>
+          <p className="text-white/50 text-xs uppercase tracking-wide mb-3">
+            Formas de pago
+          </p>
 
           <div className="flex flex-wrap gap-2">
             <span className="bg-[#1F72CD] text-white text-[11px] font-semibold px-3 py-1.5 rounded">
