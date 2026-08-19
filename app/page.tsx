@@ -381,78 +381,96 @@ export default function Home() {
       if (esMarca) {
         filtrados = filtrados.filter(p => p.marca === categoriaActiva)
       } else {
-        // Buscar en grupos de categorías (sin emojis)
-        const grupos: Record<string, string[]> = {
-          'Eléctricos': [
-            'Peluqueras',
-            'Patilleras',
-            'Afeitadoras',
-            'Trimmers de Nariz',
-            'Secadores',
-            'Secadores y cepillo secador',
-            'Rizadoras, pinzas y conos',
-            'Planchas'
-          ],
-          'Manuales': [
-            'Tijeras',
-            'Barberas y Minoras',
-            'Cabezotes',
-            'Guias de Corte'
-          ],
-          'Cuidado y Estilizado': [
-            'Ceras',
-            'Geles, balsamos y cremas de peinar',
-            'Lacas',
-            'Shampoos y Acondicionadores',
-            'Keratinas, serums y tratamientos capilares',
-            'Voluminizantes',
-            'Pigmentos, fibras, tintes y aerografos'
-          ],
-          'Aseo y Protección': [
-            'After Shave',
-            'Shaving Gel',
-            'Talcos',
-            'Cremas, exfoliantes y vaselinas',
-            'Mascarillas, velos y tratamientos faciales',
-            'Barba',
-            'Tatuajes'
-          ],
-          'Accesorios y Puesto': [
-            'Capas',
-            'Cuelleros, toallas y paños',
-            'Atomizadores, pulverizadores y sprays',
-            'Brochas, talqueras y sacudidores',
-            'Peinillas',
-            'Cepillos',
-            'Tapetes, bases y puesto de trabajo',
-            'Caimanes, pinzas y sujetadores',
-            'Maletas, gorras y accesorios'
-          ],
-          'Repuestos y Mantenimiento': [
-            'Repuestos',
-            'Lubricantes, Aceites y Mantenimiento'
-          ],
-          'Combos y Kits': [
-            'Combos'
-          ],
-          'Otros': [
-            'Otros',
-            'Remates',
-            'Minoxidil',
-            'Ollas de cera y depilacion',
-            'Pulidores, drill y uñas',
-            'Cortadoras'
-          ]
-        }
-
-        const categoriasDelGrupo = Object.entries(grupos)
-          .filter(([grupo]) => grupo === categoriaActiva)
-          .flatMap(([_, cats]) => cats)
-
-        if (categoriasDelGrupo.length > 0) {
-          filtrados = filtrados.filter(p => categoriasDelGrupo.includes(p.categoria || ''))
+        const botonesRapidos = ['OLD SCHOOL', 'STREET', 'PELUQUERAS', 'AFEITADORAS', 'CERAS', 'PLANCHAS', 'SECADORES', 'TODA LA TIENDA']
+        if (botonesRapidos.includes(categoriaActiva)) {
+          const mapeo: Record<string, string[]> = {
+            'OLD SCHOOL': ['Old School'],
+            'STREET': ['Street'],
+            'PELUQUERAS': ['Peluqueras'],
+            'AFEITADORAS': ['Afeitadoras'],
+            'CERAS': ['Ceras'],
+            'PLANCHAS': ['Planchas'],
+            'SECADORES': ['Secadores y cepillo secador'],
+            'TODA LA TIENDA': []
+          }
+          const categoriasMapeadas = mapeo[categoriaActiva] || []
+          if (categoriasMapeadas.length > 0) {
+            filtrados = filtrados.filter(p => categoriasMapeadas.includes(p.categoria || ''))
+          }
         } else {
-          filtrados = filtrados.filter(p => p.categoria === categoriaActiva)
+          // Buscar en grupos de categorías (sin emojis)
+          const grupos: Record<string, string[]> = {
+            'Eléctricos': [
+              'Peluqueras',
+              'Patilleras',
+              'Afeitadoras',
+              'Trimmers de Nariz',
+              'Secadores',
+              'Secadores y cepillo secador',
+              'Rizadoras, pinzas y conos',
+              'Planchas'
+            ],
+            'Manuales': [
+              'Tijeras',
+              'Barberas y Minoras',
+              'Cabezotes',
+              'Guias de Corte'
+            ],
+            'Cuidado y Estilizado': [
+              'Ceras',
+              'Geles, balsamos y cremas de peinar',
+              'Lacas',
+              'Shampoos y Acondicionadores',
+              'Keratinas, serums y tratamientos capilares',
+              'Voluminizantes',
+              'Pigmentos, fibras, tintes y aerografos'
+            ],
+            'Aseo y Protección': [
+              'After Shave',
+              'Shaving Gel',
+              'Talcos',
+              'Cremas, exfoliantes y vaselinas',
+              'Mascarillas, velos y tratamientos faciales',
+              'Barba',
+              'Tatuajes'
+            ],
+            'Accesorios y Puesto': [
+              'Capas',
+              'Cuelleros, toallas y paños',
+              'Atomizadores, pulverizadores y sprays',
+              'Brochas, talqueras y sacudidores',
+              'Peinillas',
+              'Cepillos',
+              'Tapetes, bases y puesto de trabajo',
+              'Caimanes, pinzas y sujetadores',
+              'Maletas, gorras y accesorios'
+            ],
+            'Repuestos y Mantenimiento': [
+              'Repuestos',
+              'Lubricantes, Aceites y Mantenimiento'
+            ],
+            'Combos y Kits': [
+              'Combos'
+            ],
+            'Otros': [
+              'Otros',
+              'Remates',
+              'Minoxidil',
+              'Ollas de cera y depilacion',
+              'Pulidores, drill y uñas',
+              'Cortadoras'
+            ]
+          }
+
+          const categoriasDelGrupo = Object.entries(grupos)
+            .filter(([grupo]) => grupo === categoriaActiva)
+            .flatMap(([_, cats]) => cats)
+
+          if (categoriasDelGrupo.length > 0) {
+            filtrados = filtrados.filter(p => categoriasDelGrupo.includes(p.categoria || ''))
+          } else {
+            filtrados = filtrados.filter(p => p.categoria === categoriaActiva)
+          }
         }
       }
     }
@@ -643,6 +661,20 @@ export default function Home() {
               : `${productosFiltrados.length} ${productosFiltrados.length === 1 ? 'producto' : 'productos'} encontrados`
             }
           </span>
+          {productosFiltrados.length > 0 && !seccionActiva && (
+            <div className="flex flex-wrap gap-1.5">
+              {productosAgrupados.map((g) => (
+                <button
+                  key={g.id}
+                  onClick={() => scrollToSeccion(g.id)}
+                  className="rounded-full border border-[#E7ECF2] px-2.5 py-1 text-[10px] font-semibold text-[#64748B] transition-colors hover:border-[#12283F]/20 hover:bg-[#F5F7FA] hover:text-[#12283F]"
+                  title={`Ir a ${g.nombre}`}
+                >
+                  {g.nombre} ({g.productos.length})
+                </button>
+              ))}
+            </div>
+          )}
           {seccionActiva && (
             <button
               onClick={() => setSeccionActiva(null)}
