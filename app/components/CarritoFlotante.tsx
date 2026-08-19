@@ -521,6 +521,37 @@ export default function CarritoFlotante() {
       )
 
       // ========================================================
+      // 3.5 NOTIFICAR POR CORREO (no bloquea el flujo si falla)
+      // ========================================================
+
+      try {
+        await fetch('/api/notificar-pedido', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pedidoId: pedido.id,
+            nombreCliente: nombreCliente.trim(),
+            telefono: telefono.trim(),
+            email: email.trim() || null,
+            ciudad: ciudad.trim(),
+            direccion: direccion.trim(),
+            notas: notas.trim() || null,
+            total,
+            items: items.map((item) => ({
+              nombre: item.nombre,
+              cantidad: item.cantidad,
+              precio: item.precio,
+            })),
+          }),
+        })
+      } catch (errorNotificacion) {
+        console.error(
+          'No se pudo enviar la notificación por correo:',
+          errorNotificacion
+        )
+      }
+
+      // ========================================================
       // 4. GENERAR PDF
       // ========================================================
 
