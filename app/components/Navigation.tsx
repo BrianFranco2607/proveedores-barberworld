@@ -198,7 +198,7 @@ export default function Navigation({
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
       setMarcasDropdownAbierto(false)
-    }, 150) // Pequeño retraso para que no se cierre si el mouse se mueve al menú
+    }, 150)
   }
 
   const handleButtonClick = () => {
@@ -364,19 +364,17 @@ export default function Navigation({
           SECCIONES PRINCIPALES
           ===================================================== */}
 
-      {/* 
-          CAMBIO DEFINITIVO EN CSS:
-          Eliminamos el overflow-x-auto del contenedor de los botones.
-          En su lugar, envolvemos los botones en un div con w-max y overflow-x-auto.
-          Esto permite que los Dropdowns se salgan completamente del flujo sin ser cortados.
-      */}
       <div className="max-w-7xl mx-auto px-4 py-2">
 
         <div className="flex flex-nowrap items-center justify-between">
           
-          {/* Envolvemos solo las categorías con el scroll, para que el celular pueda deslizar */}
+          {/* 
+             CAMBIO CRUCIAL AQUÍ: 
+             Hemos cambiado el flex-1 por flex-grow-0 y hemos añadido 
+             overflow-y-visible y pb-8 para dar espacio a los dropdowns.
+          */}
           <div 
-            className="flex flex-nowrap items-center gap-1 overflow-x-auto overflow-y-visible scrollbar-hide pb-1"
+            className="flex flex-nowrap items-center gap-1 overflow-x-auto overflow-y-visible scrollbar-hide pb-8"
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none'
@@ -432,7 +430,7 @@ export default function Navigation({
                   {seccion.nombre}
                 </button>
 
-                {/* DROPDOWN (Totalmente libre, ya no se corta) */}
+                {/* DROPDOWN */}
                 <div className="absolute left-0 top-full hidden pt-1 group-hover:block z-40">
 
                   <div className="min-w-[220px] rounded-lg border border-[#E2E8F0] bg-white p-1 shadow-lg">
@@ -495,7 +493,7 @@ export default function Navigation({
           </div>
 
           {/* =====================================================
-              MARCAS (Ahora está fuera del div que hace scroll)
+              MARCAS
               ===================================================== */}
           {marcasFiltradas.length > 0 && (
 
