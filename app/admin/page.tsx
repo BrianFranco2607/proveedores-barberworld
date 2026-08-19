@@ -1219,11 +1219,12 @@ export default function AdminPage() {
                               <div
                                 className="h-full bg-[#12283F] rounded-full"
                                 style={{
-                                  width: `${
-                                    (producto.cantidad /
-                                      (productosVendidos[0]
-                                        ?.cantidad ||
-                                        1)) *
+                                  width: `${(
+                                    producto.cantidad /
+                                    (productosVendidos[0]
+                                      ?.cantidad ||
+                                      1)
+                                  ) *
                                     100
                                   }%`,
                                 }}
@@ -1472,15 +1473,61 @@ export default function AdminPage() {
                         Selecciona una categoría
                       </option>
 
-                      {categorias.map(
-                        (cat) => (
-                          <option
-                            key={cat}
-                            value={cat}
-                          >
-                            {cat}
-                          </option>
-                        )
+                      <optgroup label="━ Categorías mayoristas ━">
+                        <option value="Peluqueras">Peluqueras</option>
+                        <option value="Patilleras">Patilleras</option>
+                        <option value="Afeitadoras">Afeitadoras</option>
+                        <option value="Trimmers de Nariz">Trimmers de Nariz</option>
+                        <option value="Secadores">Secadores</option>
+                        <option value="Secadores y cepillo secador">Secadores y cepillo secador</option>
+                        <option value="Rizadoras, pinzas y conos">Rizadoras, pinzas y conos</option>
+                        <option value="Planchas">Planchas</option>
+                        <option value="Tijeras">Tijeras</option>
+                        <option value="Barberas y Minoras">Barberas y Minoras</option>
+                        <option value="Cabezotes">Cabezotes</option>
+                        <option value="Guias de Corte">Guias de Corte</option>
+                        <option value="Ceras">Ceras</option>
+                        <option value="Geles, balsamos y cremas de peinar">Geles, balsamos y cremas de peinar</option>
+                        <option value="Lacas">Lacas</option>
+                        <option value="Shampoos y Acondicionadores">Shampoos y Acondicionadores</option>
+                        <option value="Keratinas, serums y tratamientos capilares">Keratinas, serums y tratamientos capilares</option>
+                        <option value="Voluminizantes">Voluminizantes</option>
+                        <option value="Pigmentos, fibras, tintes y aerografos">Pigmentos, fibras, tintes y aerografos</option>
+                        <option value="After Shave">After Shave</option>
+                        <option value="Shaving Gel">Shaving Gel</option>
+                        <option value="Talcos">Talcos</option>
+                        <option value="Cremas, exfoliantes y vaselinas">Cremas, exfoliantes y vaselinas</option>
+                        <option value="Mascarillas, velos y tratamientos faciales">Mascarillas, velos y tratamientos faciales</option>
+                        <option value="Barba">Barba</option>
+                        <option value="Tatuajes">Tatuajes</option>
+                        <option value="Capas">Capas</option>
+                        <option value="Cuelleros, toallas y paños">Cuelleros, toallas y paños</option>
+                        <option value="Atomizadores, pulverizadores y sprays">Atomizadores, pulverizadores y sprays</option>
+                        <option value="Brochas, talqueras y sacudidores">Brochas, talqueras y sacudidores</option>
+                        <option value="Peinillas">Peinillas</option>
+                        <option value="Cepillos">Cepillos</option>
+                        <option value="Tapetes, bases y puesto de trabajo">Tapetes, bases y puesto de trabajo</option>
+                        <option value="Caimanes, pinzas y sujetadores">Caimanes, pinzas y sujetadores</option>
+                        <option value="Maletas, gorras y accesorios">Maletas, gorras y accesorios</option>
+                        <option value="Repuestos">Repuestos</option>
+                        <option value="Lubricantes, Aceites y Mantenimiento">Lubricantes, Aceites y Mantenimiento</option>
+                        <option value="Combos">Combos</option>
+                        <option value="Otros">Otros</option>
+                        <option value="Remates">Remates</option>
+                        <option value="Minoxidil">Minoxidil</option>
+                        <option value="Ollas de cera y depilacion">Ollas de cera y depilacion</option>
+                        <option value="Pulidores, drill y uñas">Pulidores, drill y uñas</option>
+                        <option value="Cortadoras">Cortadoras</option>
+                      </optgroup>
+
+                      {categorias.length > 0 && (
+                        <optgroup label="━ Categorías existentes ━">
+                          {categorias.map((cat) => (
+                            <option key={cat} value={cat}>
+                              {cat}
+                            </option>
+                          ))}
+                        </optgroup>
                       )}
 
                       <option value="__nueva__">
@@ -1494,9 +1541,7 @@ export default function AdminPage() {
                         value={
                           nuevaCategoria
                         }
-                        onChange={(
-                          e
-                        ) =>
+                        onChange={(e) =>
                           setNuevaCategoria(
                             e.target.value
                           )
@@ -1683,8 +1728,7 @@ export default function AdminPage() {
                     key={
                       product.id
                     }
-                    className={`bg-white rounded-xl border overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col h-full ${
-                      product.activo
+                    className={`bg-white rounded-xl border overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col h-full ${product.activo
                         ? 'border-[#E2E8F0]'
                         : 'border-[#E2E8F0] opacity-60'
                     }`}
@@ -1758,15 +1802,13 @@ export default function AdminPage() {
                               togglingId ===
                               product.id
                             }
-                            className={`shrink-0 relative w-11 h-6 rounded-full transition-colors disabled:opacity-50 cursor-pointer ${
-                              product.activo
+                            className={`shrink-0 relative w-11 h-6 rounded-full transition-colors disabled:opacity-50 cursor-pointer ${product.activo
                                 ? 'bg-[#12283F]'
                                 : 'bg-[#CBD5E1]'
                             }`}
                           >
                             <span
-                              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${
-                                product.activo
+                              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${product.activo
                                   ? 'translate-x-5'
                                   : 'translate-x-0'
                               }`}

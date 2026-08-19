@@ -21,7 +21,7 @@ const BOTONES_RAPIDOS = [
 // EXACTO (mayúsculas/minúsculas incluidas) con lo que subas a /public,
 // porque en producción (Vercel/Linux) el sistema de archivos es sensible a mayúsculas.
 const ICONOS_BOTONES: Record<string, string> = {
-  'OLD SCHOOL': '/oldschool.png',
+  'OLD SCHOOL': '/Oldschool.png',
   'STREET': '/Street.png',
   'PELUQUERAS': '/Peluqueras.png',
   'AFEITADORAS': '/afeitadoras.png',
