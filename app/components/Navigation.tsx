@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '../lib/supabase'
 
 // Botones de acceso rápido
@@ -136,6 +136,7 @@ export default function Navigation({
 }) {
   const [marcas, setMarcas] = useState<string[]>([])
   const [marcasMenuAbierto, setMarcasMenuAbierto] = useState(false)
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -188,6 +189,22 @@ export default function Navigation({
     setMarcasMenuAbierto(false)
   }
 
+  // Lógica para abrir/cerrar el menú tanto con hover como con click
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    setMarcasMenuAbierto(true)
+  }
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setMarcasMenuAbierto(false)
+    }, 150) // Pequeño retraso para que no se cierre si el mouse se mueve al menú
+  }
+
+  const handleButtonClick = () => {
+    setMarcasMenuAbierto(!marcasMenuAbierto)
+  }
+
   return (
     <div className="bg-white border-b border-[#E2E8F0] sticky top-0 z-30">
 
@@ -210,7 +227,7 @@ export default function Navigation({
             scroll-smooth
             snap-x snap-mandatory
             scrollbar-hide
-            sm:justify-center /* <--- ESTO CENTRA LOS BOTONES EN PC */
+            sm:justify-center
           "
           style={{
             WebkitOverflowScrolling: 'touch',
@@ -488,12 +505,12 @@ export default function Navigation({
 
             <div 
               className="relative group ml-auto shrink-0"
-              onMouseEnter={() => setMarcasMenuAbierto(true)}
-              onMouseLeave={() => setMarcasMenuAbierto(false)}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
             >
 
               <button
-                onClick={() => setMarcasMenuAbierto(!marcasMenuAbierto)}
+                onClick={handleButtonClick}
                 className="
                   whitespace-nowrap
                   px-3 py-1
@@ -510,7 +527,7 @@ export default function Navigation({
               </button>
 
 
-              <div className={`absolute right-0 pt-1 z-40 ${marcasMenuAbierto ? 'block' : 'hidden group-hover:block'}`}>
+              <div className={`absolute right-0 pt-1 z-40 ${marcasMenuAbierto ? 'block' : 'hidden'}`}>
 
                 <div className="bg-white rounded-lg shadow-lg border border-[#E2E8F0] p-1 min-w-[140px]">
 
