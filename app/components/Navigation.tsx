@@ -365,18 +365,18 @@ export default function Navigation({
           ===================================================== */}
 
       {/* 
-          CAMBIO CLAVE EN CSS (APLICADO A TODA LA BARRA):
-          El contenedor padre ahora usa overflow-visible (no corta nada, permitiendo que los dropdowns floten).
-          El scroll horizontal se lo dimos a un DIV INTERNO llamado "scroll-wrapper".
-          Todos los elementos (TODOS, Secciones y Marcas) quedan fuera del scroll-wrapper para que sus menús floten libremente.
+          CAMBIO DEFINITIVO EN CSS:
+          Eliminamos el overflow-x-auto del contenedor de los botones.
+          En su lugar, envolvemos los botones en un div con w-max y overflow-x-auto.
+          Esto permite que los Dropdowns se salgan completamente del flujo sin ser cortados.
       */}
-      <div className="max-w-7xl mx-auto px-4 py-2 overflow-visible">
+      <div className="max-w-7xl mx-auto px-4 py-2">
 
-        <div className="flex flex-nowrap items-center justify-between overflow-visible">
+        <div className="flex flex-nowrap items-center justify-between">
           
-          {/* Envolvemos solo los botones VISIBLES con el scroll, para que el celular pueda deslizar */}
+          {/* Envolvemos solo las categorías con el scroll, para que el celular pueda deslizar */}
           <div 
-            className="flex flex-nowrap items-center gap-1 overflow-x-auto overflow-y-visible scrollbar-hide pb-1 flex-1"
+            className="flex flex-nowrap items-center gap-1 overflow-x-auto overflow-y-visible scrollbar-hide pb-1"
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none'
@@ -432,7 +432,7 @@ export default function Navigation({
                   {seccion.nombre}
                 </button>
 
-                {/* DROPDOWN (AHORA FLOTA LIBREMENTE PORQUE NO ESTÁ EN EL CONTENEDOR CON SCROLL) */}
+                {/* DROPDOWN (Totalmente libre, ya no se corta) */}
                 <div className="absolute left-0 top-full hidden pt-1 group-hover:block z-40">
 
                   <div className="min-w-[220px] rounded-lg border border-[#E2E8F0] bg-white p-1 shadow-lg">
@@ -522,7 +522,6 @@ export default function Navigation({
                 Marcas <span className="text-[10px]">▼</span>
               </button>
 
-              {/* El menú ya no queda encerrado ni tapado. Usa z-50 para flotar sobre los productos */}
               <div className={`absolute right-0 top-full pt-1 z-50 ${marcasDropdownAbierto ? 'block' : 'hidden'}`}>
                 <div className="bg-white rounded-lg shadow-lg border border-[#E2E8F0] p-1 min-w-[140px]">
                   {marcasFiltradas.map((marca) => (
