@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '../lib/supabase'
 
-// Botones de acceso rápido (como en la web de BarberWorld)
+// Botones de acceso rápido
 const BOTONES_RAPIDOS = [
   'OLD SCHOOL',
   'STREET',
@@ -15,13 +15,11 @@ const BOTONES_RAPIDOS = [
   'TODA LA TIENDA'
 ]
 
-// Íconos opcionales para botones rápidos puntuales.
-// Las imágenes deben vivir en /public (ej: /public/oldschool.png) para poder
-// referenciarlas como '/oldschool.png'. Los nombres de archivo deben coincidir
-// EXACTO (mayúsculas/minúsculas incluidas) con lo que subas a /public,
-// porque en producción (Vercel/Linux) el sistema de archivos es sensible a mayúsculas.
+// Íconos de los botones rápidos.
+// IMPORTANTE: los nombres deben coincidir EXACTAMENTE
+// con los archivos dentro de /public.
 const ICONOS_BOTONES: Record<string, string> = {
-  'OLD SCHOOL': '/oldschool.png',
+  'OLD SCHOOL': '/Oldschool.png',
   'STREET': '/Street.png',
   'PELUQUERAS': '/Peluqueras.png',
   'AFEITADORAS': '/afeitadoras.png',
@@ -31,7 +29,7 @@ const ICONOS_BOTONES: Record<string, string> = {
   'TODA LA TIENDA': '/Todalatienda.png',
 }
 
-// Grupos de categorías (sin emojis, con tipografía elegante)
+// Grupos de categorías
 const SECCIONES = [
   {
     id: 'electricos',
@@ -125,12 +123,12 @@ const SECCIONES = [
   }
 ]
 
-export default function Navigation({ 
-  onCategoriaChange, 
+export default function Navigation({
+  onCategoriaChange,
   categoriaActiva = 'Todas',
   onSeccionChange,
   seccionActiva = null
-}: { 
+}: {
   onCategoriaChange?: (categoria: string) => void
   categoriaActiva?: string
   onSeccionChange?: (seccion: string | null) => void
@@ -148,15 +146,29 @@ export default function Navigation({
         .not('marca', 'eq', '')
 
       if (data) {
-        const marcasUnicas = [...new Set(data.map(p => p.marca))].filter(Boolean)
+        const marcasUnicas = [...new Set(data.map(p => p.marca))]
+          .filter(Boolean)
+
         setMarcas(marcasUnicas.sort())
       }
     }
+
     cargarMarcas()
   }, [])
 
-  const marcasDestacadas = ['Babyliss', 'JRL', 'Reuzel', 'Stylecraft', 'Street', 'Turbox', 'Old School', 'Wahl', 'Very Secret']
-  const marcasFiltradas = marcasDestacadas.filter(m => 
+  const marcasDestacadas = [
+    'Babyliss',
+    'JRL',
+    'Reuzel',
+    'Stylecraft',
+    'Street',
+    'Turbox',
+    'Old School',
+    'Wahl',
+    'Very Secret'
+  ]
+
+  const marcasFiltradas = marcasDestacadas.filter(m =>
     marcas.some(marca => marca.toLowerCase() === m.toLowerCase())
   )
 
@@ -164,154 +176,392 @@ export default function Navigation({
     if (onSeccionChange) {
       onSeccionChange(seccionId)
     }
+
     if (onCategoriaChange) {
       onCategoriaChange('Todas')
     }
   }
 
-  // Click en una subcategoría dentro del dropdown de una sección:
-  // filtra directo por esa categoría puntual (page.tsx ya sabe resolver
-  // un nombre de categoría exacto que no es marca ni botón rápido).
   const handleCategoriaClick = (categoria: string) => {
     onCategoriaChange?.(categoria)
   }
 
   return (
     <div className="bg-white border-b border-[#E2E8F0] sticky top-0 z-30">
-      {/* Botones de acceso rápido */}
-      <div className="max-w-7xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3 border-b border-[#E2E8F0]">
-        {BOTONES_RAPIDOS.map((boton) => {
-          const icono = ICONOS_BOTONES[boton]
 
-          if (icono) {
-            const activo = categoriaActiva === boton
+      {/* =====================================================
+          BOTONES DE ACCESO RÁPIDO
+          ===================================================== */}
+
+      <div className="relative border-b border-[#E2E8F0]">
+
+        {/* Contenedor deslizable en móvil */}
+        <div
+          className="
+            max-w-7xl mx-auto
+            px-4 py-3 sm:py-4
+            flex items-center
+            gap-2 sm:gap-3
+            overflow-x-auto
+            overflow-y-hidden
+            flex-nowrap
+            scroll-smooth
+            snap-x snap-mandatory
+            scrollbar-hide
+          "
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none'
+          }}
+        >
+
+          {BOTONES_RAPIDOS.map((boton) => {
+            const icono = ICONOS_BOTONES[boton]
+
+            if (icono) {
+              const activo = categoriaActiva === boton
+
+              return (
+                <button
+                  key={boton}
+                  onClick={() => onCategoriaChange?.(boton)}
+                  className={`
+                    shrink-0 snap-start
+                    flex flex-col items-center
+                    gap-1 sm:gap-1.5
+                    rounded-xl
+                    px-2 sm:px-3
+                    py-1.5 sm:py-2
+                    transition-all
+                    ${activo
+                      ? 'bg-[#12283F]/[0.06] ring-1 ring-[#12283F]/30'
+                      : 'hover:bg-[#F5F7FA]'
+                    }
+                  `}
+                  aria-label={`Ver categoría ${boton}`}
+                >
+
+                  <span
+                    className="
+                      h-16 w-16
+                      sm:h-20 sm:w-20
+                      overflow-hidden
+                      rounded-full
+                      border border-[#E2E8F0]
+                      bg-white
+                      shadow-sm
+                    "
+                  >
+                    <img
+                      src={icono}
+                      alt={boton}
+                      className="h-full w-full object-cover"
+                    />
+                  </span>
+
+                  <span
+                    className={`
+                      whitespace-nowrap
+                      text-[9px] sm:text-[10px]
+                      font-bold
+                      tracking-wide
+                      ${activo
+                        ? 'text-[#12283F]'
+                        : 'text-[#64748B]'
+                      }
+                    `}
+                  >
+                    {boton}
+                  </span>
+
+                </button>
+              )
+            }
+
             return (
               <button
                 key={boton}
                 onClick={() => onCategoriaChange?.(boton)}
-                className={`flex flex-col items-center gap-1.5 rounded-xl px-3 py-2 transition-all ${
-                  activo ? 'bg-[#12283F]/[0.06] ring-1 ring-[#12283F]/30' : 'hover:bg-[#F5F7FA]'
-                }`}
-                aria-label={`Ver categoría ${boton}`}
+                className={`
+                  shrink-0
+                  whitespace-nowrap
+                  px-3 py-1
+                  text-[10px]
+                  font-bold
+                  tracking-wide
+                  rounded-full
+                  transition-all
+                  ${
+                    categoriaActiva === boton
+                      ? 'bg-[#12283F] text-white'
+                      : 'text-[#64748B] hover:bg-[#F5F7FA]'
+                  }
+                `}
               >
-                <span className="h-20 w-20 overflow-hidden rounded-full border border-[#E2E8F0] bg-white shadow-sm">
-                  <img
-                    src={icono}
-                    alt={boton}
-                    className="h-full w-full object-cover"
-                  />
-                </span>
-                <span
-                  className={`text-[10px] font-bold tracking-wide ${
-                    activo ? 'text-[#12283F]' : 'text-[#64748B]'
-                  }`}
-                >
-                  {boton}
-                </span>
+                {boton}
               </button>
             )
-          }
+          })}
 
-          return (
-            <button
-              key={boton}
-              onClick={() => onCategoriaChange?.(boton)}
-              className={`px-3 py-1 text-[10px] font-bold tracking-wide rounded-full transition-all ${
-                categoriaActiva === boton
-                  ? 'bg-[#12283F] text-white'
-                  : 'text-[#64748B] hover:bg-[#F5F7FA]'
-              }`}
-            >
-              {boton}
-            </button>
-          )
-        })}
+        </div>
+
+        {/* Indicadores laterales en móvil */}
+        <div
+          className="
+            pointer-events-none
+            absolute
+            right-0
+            top-0
+            bottom-0
+            w-10
+            bg-gradient-to-l
+            from-white
+            to-transparent
+            sm:hidden
+          "
+        />
+
+        <div
+          className="
+            pointer-events-none
+            absolute
+            left-0
+            top-0
+            bottom-0
+            w-3
+            bg-gradient-to-r
+            from-white
+            to-transparent
+            sm:hidden
+          "
+        />
+
       </div>
 
-      {/* Secciones (navegación principal) */}
+
+      {/* =====================================================
+          SECCIONES PRINCIPALES
+          ===================================================== */}
+
       <div className="max-w-7xl mx-auto px-4 py-2">
-        <div className="flex flex-wrap items-center gap-1">
+
+        <div
+          className="
+            flex
+            flex-nowrap
+            items-center
+            gap-1
+            overflow-x-auto
+            overflow-y-visible
+            scrollbar-hide
+          "
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none'
+          }}
+        >
+
+          {/* TODOS */}
+
           <button
             onClick={() => handleSeccionClick(null)}
-            className={`shrink-0 px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
-              seccionActiva === null
-                ? 'bg-[#12283F] text-white'
-                : 'text-[#64748B] hover:bg-[#F5F7FA]'
-            }`}
+            className={`
+              shrink-0
+              px-3 py-1
+              text-xs
+              font-semibold
+              rounded-lg
+              transition-all
+              ${
+                seccionActiva === null
+                  ? 'bg-[#12283F] text-white'
+                  : 'text-[#64748B] hover:bg-[#F5F7FA]'
+              }
+            `}
           >
             Todos
           </button>
 
+
+          {/* SECCIONES */}
+
           {SECCIONES.map((seccion) => (
-            <div key={seccion.id} className="relative group shrink-0">
+
+            <div
+              key={seccion.id}
+              className="relative group shrink-0"
+            >
+
               <button
                 onClick={() => handleSeccionClick(seccion.id)}
-                className={`shrink-0 px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
-                  seccionActiva === seccion.id
-                    ? 'bg-[#12283F] text-white'
-                    : 'text-[#64748B] hover:bg-[#F5F7FA]'
-                }`}
+                className={`
+                  shrink-0
+                  whitespace-nowrap
+                  px-3 py-1
+                  text-xs
+                  font-semibold
+                  rounded-lg
+                  transition-all
+                  ${
+                    seccionActiva === seccion.id
+                      ? 'bg-[#12283F] text-white'
+                      : 'text-[#64748B] hover:bg-[#F5F7FA]'
+                  }
+                `}
               >
                 {seccion.nombre}
               </button>
 
-              {/* Dropdown de subcategorías al pasar el cursor */}
+
+              {/* DROPDOWN */}
+
               <div className="absolute left-0 top-full hidden pt-1 group-hover:block z-40">
+
                 <div className="min-w-[220px] rounded-lg border border-[#E2E8F0] bg-white p-1 shadow-lg">
+
                   {seccion.categorias.map((cat) => (
+
                     <button
                       key={cat}
                       onClick={() => handleCategoriaClick(cat)}
-                      className={`block w-full rounded px-3 py-1.5 text-left text-xs transition-colors ${
-                        categoriaActiva === cat
-                          ? 'bg-[#F5F7FA] font-semibold text-[#12283F]'
-                          : 'text-[#64748B] hover:bg-[#F5F7FA]'
-                      }`}
+                      className={`
+                        block
+                        w-full
+                        rounded
+                        px-3 py-1.5
+                        text-left
+                        text-xs
+                        transition-colors
+                        ${
+                          categoriaActiva === cat
+                            ? 'bg-[#F5F7FA] font-semibold text-[#12283F]'
+                            : 'text-[#64748B] hover:bg-[#F5F7FA]'
+                        }
+                      `}
                     >
                       {cat}
                     </button>
+
                   ))}
+
 
                   <button
                     onClick={() => handleSeccionClick(seccion.id)}
-                    className="mt-1 block w-full rounded border-t border-[#E2E8F0] px-3 py-1.5 pt-1.5 text-left text-xs font-semibold text-[#12283F] transition-colors hover:bg-[#F5F7FA]"
+                    className="
+                      mt-1
+                      block
+                      w-full
+                      rounded
+                      border-t
+                      border-[#E2E8F0]
+                      px-3
+                      py-1.5
+                      text-left
+                      text-xs
+                      font-semibold
+                      text-[#12283F]
+                      transition-colors
+                      hover:bg-[#F5F7FA]
+                    "
                   >
                     Ver toda la sección
                   </button>
+
                 </div>
+
               </div>
+
             </div>
+
           ))}
 
-          {/* Marcas */}
+
+          {/* =====================================================
+              MARCAS
+              ===================================================== */}
+
           {marcasFiltradas.length > 0 && (
-            <div className="relative group ml-auto">
-              <button className="px-3 py-1 text-xs font-medium text-[#64748B] hover:bg-[#F5F7FA] rounded-full transition-colors">
+
+            <div className="relative group ml-auto shrink-0">
+
+              <button
+                className="
+                  whitespace-nowrap
+                  px-3 py-1
+                  text-xs
+                  font-medium
+                  text-[#64748B]
+                  hover:bg-[#F5F7FA]
+                  rounded-full
+                  transition-colors
+                "
+              >
                 Marcas ▼
               </button>
+
+
               <div className="absolute right-0 pt-1 hidden group-hover:block z-40">
+
                 <div className="bg-white rounded-lg shadow-lg border border-[#E2E8F0] p-1 min-w-[140px]">
+
                   {marcasFiltradas.map((marca) => (
+
                     <button
                       key={marca}
                       onClick={() => onCategoriaChange?.(marca)}
-                      className="block w-full text-left px-3 py-1.5 text-xs text-[#64748B] hover:bg-[#F5F7FA] rounded transition-colors"
+                      className="
+                        block
+                        w-full
+                        text-left
+                        px-3 py-1.5
+                        text-xs
+                        text-[#64748B]
+                        hover:bg-[#F5F7FA]
+                        rounded
+                        transition-colors
+                      "
                     >
                       {marca}
                     </button>
+
                   ))}
+
+
                   <button
                     onClick={() => onCategoriaChange?.('Todas')}
-                    className="block w-full text-left px-3 py-1.5 text-xs font-semibold text-[#12283F] hover:bg-[#F5F7FA] rounded transition-colors border-t border-[#E2E8F0] mt-1 pt-1.5"
+                    className="
+                      block
+                      w-full
+                      text-left
+                      px-3 py-1.5
+                      text-xs
+                      font-semibold
+                      text-[#12283F]
+                      hover:bg-[#F5F7FA]
+                      rounded
+                      transition-colors
+                      border-t
+                      border-[#E2E8F0]
+                      mt-1
+                      pt-1.5
+                    "
                   >
                     Ver Todos
                   </button>
+
                 </div>
+
               </div>
+
             </div>
+
           )}
+
         </div>
+
       </div>
+
     </div>
   )
 }
