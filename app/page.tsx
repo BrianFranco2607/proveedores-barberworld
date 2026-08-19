@@ -590,7 +590,7 @@ export default function Home() {
       </div>
 
       {/* Header - AHORA ES RELATIVE, NO STICKY */}
-      <header className="relative border-b border-[#E7ECF2] bg-white/95 backdrop-blur">
+      <header className="relative z-40 border-b border-[#E7ECF2] bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <img
