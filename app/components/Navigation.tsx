@@ -135,7 +135,7 @@ export default function Navigation({
   seccionActiva?: string | null
 }) {
   const [marcas, setMarcas] = useState<string[]>([])
-  const [marcasMenuAbierto, setMarcasMenuAbierto] = useState(false)
+  const [marcasDropdownAbierto, setMarcasDropdownAbierto] = useState(false)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const supabase = createClient()
 
@@ -186,23 +186,23 @@ export default function Navigation({
 
   const handleCategoriaClick = (categoria: string) => {
     onCategoriaChange?.(categoria)
-    setMarcasMenuAbierto(false)
+    setMarcasDropdownAbierto(false)
   }
 
   // Lógica para abrir/cerrar el menú tanto con hover como con click
   const handleMouseEnter = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    setMarcasMenuAbierto(true)
+    setMarcasDropdownAbierto(true)
   }
 
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
-      setMarcasMenuAbierto(false)
+      setMarcasDropdownAbierto(false)
     }, 150) // Pequeño retraso para que no se cierre si el mouse se mueve al menú
   }
 
   const handleButtonClick = () => {
-    setMarcasMenuAbierto(!marcasMenuAbierto)
+    setMarcasDropdownAbierto(!marcasDropdownAbierto)
   }
 
   return (
@@ -498,7 +498,9 @@ export default function Navigation({
 
 
           {/* =====================================================
-              MARCAS (CORREGIDO PARA HOVER EN PC Y CLICK EN CELULAR)
+              MARCAS
+              CAMBIO MÍNIMO: Sacamos este div del bloque del scroll
+              para que el dropdown no se corte y se pueda abrir con hover/click
               ===================================================== */}
 
           {marcasFiltradas.length > 0 && (
@@ -527,7 +529,7 @@ export default function Navigation({
               </button>
 
 
-              <div className={`absolute right-0 pt-1 z-40 ${marcasMenuAbierto ? 'block' : 'hidden'}`}>
+              <div className={`absolute right-0 pt-1 z-40 ${marcasDropdownAbierto ? 'block' : 'hidden'}`}>
 
                 <div className="bg-white rounded-lg shadow-lg border border-[#E2E8F0] p-1 min-w-[140px]">
 
