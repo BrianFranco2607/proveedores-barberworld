@@ -497,8 +497,7 @@ export default function Home() {
     ? SECCIONES.find(s => s.id === seccionActiva)?.nombre || seccionActiva
     : null
 
-  // Productos que realmente pertenecen a la sección activa (antes esto
-  // faltaba y por eso se mostraba la lista completa sin filtrar).
+  // Productos que realmente pertenecen a la sección activa
   const seccionActivaObj = seccionActiva
     ? SECCIONES.find(s => s.id === seccionActiva)
     : null
@@ -653,37 +652,7 @@ export default function Home() {
 
       {/* Contenido */}
       <main className="mx-auto max-w-6xl px-4 py-10">
-        {/* Contador de productos y navegación rápida */}
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-2 text-sm text-[#64748B]">
-          <span className="font-medium">
-            {seccionActiva
-              ? `${productosDeSeccionActiva.length} ${productosDeSeccionActiva.length === 1 ? 'producto' : 'productos'} en ${seccionActivaNombre}`
-              : `${productosFiltrados.length} ${productosFiltrados.length === 1 ? 'producto' : 'productos'} encontrados`
-            }
-          </span>
-          {productosFiltrados.length > 0 && !seccionActiva && (
-            <div className="flex flex-wrap gap-1.5">
-              {productosAgrupados.map((g) => (
-                <button
-                  key={g.id}
-                  onClick={() => scrollToSeccion(g.id)}
-                  className="rounded-full border border-[#E7ECF2] px-2.5 py-1 text-[10px] font-semibold text-[#64748B] transition-colors hover:border-[#12283F]/20 hover:bg-[#F5F7FA] hover:text-[#12283F]"
-                  title={`Ir a ${g.nombre}`}
-                >
-                  {g.nombre} ({g.productos.length})
-                </button>
-              ))}
-            </div>
-          )}
-          {seccionActiva && (
-            <button
-              onClick={() => setSeccionActiva(null)}
-              className="text-xs font-semibold text-[#1C3D5F] hover:underline"
-            >
-              ← Ver todas las secciones
-            </button>
-          )}
-        </div>
+        {/* Aquí se ha eliminado el div de los contadores de categorías */}
 
         {cargando ? (
           <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
