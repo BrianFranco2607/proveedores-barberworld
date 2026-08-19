@@ -364,149 +364,143 @@ export default function Navigation({
           SECCIONES PRINCIPALES
           ===================================================== */}
 
-      <div className="max-w-7xl mx-auto px-4 py-2">
+      {/* 
+          CAMBIO CLAVE EN CSS:
+          El contenedor padre ahora usa overflow-visible (no corta nada).
+          El scroll horizontal se lo dimos a un DIV INTERNO llamado "scroll-wrapper".
+          El botón de Marcas queda fuera del "scroll-wrapper" para que su menú flote libremente.
+      */}
+      <div className="max-w-7xl mx-auto px-4 py-2 overflow-visible">
 
-        <div
-          className="
-            flex
-            flex-nowrap
-            items-center
-            gap-1
-            overflow-x-auto
-            overflow-y-visible
-            scrollbar-hide
-          "
-          style={{
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none'
-          }}
-        >
-
-          {/* TODOS */}
-
-          <button
-            onClick={() => handleSeccionClick(null)}
-            className={`
-              shrink-0
-              px-3 py-1
-              text-xs
-              font-semibold
-              rounded-lg
-              transition-all
-              ${
-                seccionActiva === null
-                  ? 'bg-[#12283F] text-white'
-                  : 'text-[#64748B] hover:bg-[#F5F7FA]'
-              }
-            `}
+        <div className="flex flex-nowrap items-center justify-between overflow-visible">
+          
+          {/* Envolvemos solo las categorías con el scroll, para que el celular pueda deslizar */}
+          <div 
+            className="flex flex-nowrap items-center gap-1 overflow-x-auto overflow-y-visible scrollbar-hide pb-1 flex-1"
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none'
+            }}
           >
-            Todos
-          </button>
 
-
-          {/* SECCIONES */}
-
-          {SECCIONES.map((seccion) => (
-
-            <div
-              key={seccion.id}
-              className="relative group shrink-0"
+            {/* TODOS */}
+            <button
+              onClick={() => handleSeccionClick(null)}
+              className={`
+                shrink-0
+                px-3 py-1
+                text-xs
+                font-semibold
+                rounded-lg
+                transition-all
+                ${
+                  seccionActiva === null
+                    ? 'bg-[#12283F] text-white'
+                    : 'text-[#64748B] hover:bg-[#F5F7FA]'
+                }
+              `}
             >
+              Todos
+            </button>
 
-              <button
-                onClick={() => handleSeccionClick(seccion.id)}
-                className={`
-                  shrink-0
-                  whitespace-nowrap
-                  px-3 py-1
-                  text-xs
-                  font-semibold
-                  rounded-lg
-                  transition-all
-                  ${
-                    seccionActiva === seccion.id
-                      ? 'bg-[#12283F] text-white'
-                      : 'text-[#64748B] hover:bg-[#F5F7FA]'
-                  }
-                `}
+
+            {/* SECCIONES */}
+            {SECCIONES.map((seccion) => (
+
+              <div
+                key={seccion.id}
+                className="relative group shrink-0"
               >
-                {seccion.nombre}
-              </button>
 
+                <button
+                  onClick={() => handleSeccionClick(seccion.id)}
+                  className={`
+                    shrink-0
+                    whitespace-nowrap
+                    px-3 py-1
+                    text-xs
+                    font-semibold
+                    rounded-lg
+                    transition-all
+                    ${
+                      seccionActiva === seccion.id
+                        ? 'bg-[#12283F] text-white'
+                        : 'text-[#64748B] hover:bg-[#F5F7FA]'
+                    }
+                  `}
+                >
+                  {seccion.nombre}
+                </button>
 
-              {/* DROPDOWN */}
+                {/* DROPDOWN */}
+                <div className="absolute left-0 top-full hidden pt-1 group-hover:block z-40">
 
-              <div className="absolute left-0 top-full hidden pt-1 group-hover:block z-40">
+                  <div className="min-w-[220px] rounded-lg border border-[#E2E8F0] bg-white p-1 shadow-lg">
 
-                <div className="min-w-[220px] rounded-lg border border-[#E2E8F0] bg-white p-1 shadow-lg">
+                    {seccion.categorias.map((cat) => (
 
-                  {seccion.categorias.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => handleCategoriaClick(cat)}
+                        className={`
+                          block
+                          w-full
+                          rounded
+                          px-3 py-1.5
+                          text-left
+                          text-xs
+                          transition-colors
+                          ${
+                            categoriaActiva === cat
+                              ? 'bg-[#F5F7FA] font-semibold text-[#12283F]'
+                              : 'text-[#64748B] hover:bg-[#F5F7FA]'
+                          }
+                        `}
+                      >
+                        {cat}
+                      </button>
+
+                    ))}
 
                     <button
-                      key={cat}
-                      onClick={() => handleCategoriaClick(cat)}
-                      className={`
+                      onClick={() => handleSeccionClick(seccion.id)}
+                      className="
+                        mt-1
                         block
                         w-full
                         rounded
-                        px-3 py-1.5
+                        border-t
+                        border-[#E2E8F0]
+                        px-3
+                        py-1.5
                         text-left
                         text-xs
+                        font-semibold
+                        text-[#12283F]
                         transition-colors
-                        ${
-                          categoriaActiva === cat
-                            ? 'bg-[#F5F7FA] font-semibold text-[#12283F]'
-                            : 'text-[#64748B] hover:bg-[#F5F7FA]'
-                        }
-                      `}
+                        hover:bg-[#F5F7FA]
+                      "
                     >
-                      {cat}
+                      Ver toda la sección
                     </button>
 
-                  ))}
-
-
-                  <button
-                    onClick={() => handleSeccionClick(seccion.id)}
-                    className="
-                      mt-1
-                      block
-                      w-full
-                      rounded
-                      border-t
-                      border-[#E2E8F0]
-                      px-3
-                      py-1.5
-                      text-left
-                      text-xs
-                      font-semibold
-                      text-[#12283F]
-                      transition-colors
-                      hover:bg-[#F5F7FA]
-                    "
-                  >
-                    Ver toda la sección
-                  </button>
+                  </div>
 
                 </div>
 
               </div>
 
-            </div>
+            ))}
 
-          ))}
-
+          </div>
 
           {/* =====================================================
-              MARCAS
-              CAMBIO MÍNIMO: Sacamos este div del bloque del scroll
-              para que el dropdown no se corte y se pueda abrir con hover/click
+              MARCAS (Ahora está fuera del div que hace scroll)
               ===================================================== */}
-
           {marcasFiltradas.length > 0 && (
 
             <div 
-              className="relative group ml-auto shrink-0"
+              className="relative group ml-2 shrink-0"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
             >
@@ -528,13 +522,10 @@ export default function Navigation({
                 Marcas <span className="text-[10px]">▼</span>
               </button>
 
-
-              <div className={`absolute right-0 pt-1 z-40 ${marcasDropdownAbierto ? 'block' : 'hidden'}`}>
-
+              {/* El menú ya no queda encerrado ni tapado. Usa z-50 para flotar sobre los productos */}
+              <div className={`absolute right-0 top-full pt-1 z-50 ${marcasDropdownAbierto ? 'block' : 'hidden'}`}>
                 <div className="bg-white rounded-lg shadow-lg border border-[#E2E8F0] p-1 min-w-[140px]">
-
                   {marcasFiltradas.map((marca) => (
-
                     <button
                       key={marca}
                       onClick={() => handleCategoriaClick(marca)}
@@ -552,10 +543,7 @@ export default function Navigation({
                     >
                       {marca}
                     </button>
-
                   ))}
-
-
                   <button
                     onClick={() => handleCategoriaClick('Todas')}
                     className="
@@ -577,9 +565,7 @@ export default function Navigation({
                   >
                     Ver Todos
                   </button>
-
                 </div>
-
               </div>
 
             </div>
