@@ -135,6 +135,7 @@ export default function Navigation({
   seccionActiva?: string | null
 }) {
   const [marcas, setMarcas] = useState<string[]>([])
+  const [marcasMenuAbierto, setMarcasMenuAbierto] = useState(false)
   const supabase = createClient()
 
   useEffect(() => {
@@ -184,6 +185,7 @@ export default function Navigation({
 
   const handleCategoriaClick = (categoria: string) => {
     onCategoriaChange?.(categoria)
+    setMarcasMenuAbierto(false)
   }
 
   return (
@@ -195,19 +197,20 @@ export default function Navigation({
 
       <div className="relative border-b border-[#E2E8F0]">
 
-        {/* Contenedor deslizable en móvil */}
+        {/* Contenedor deslizable en móvil / Centrado en PC */}
         <div
           className="
             max-w-7xl mx-auto
-            px-4 py-3 sm:py-4
+            px-4 py-3 sm:py-5
             flex items-center
-            gap-2 sm:gap-3
+            gap-3 sm:gap-5 md:gap-6
             overflow-x-auto
             overflow-y-hidden
             flex-nowrap
             scroll-smooth
             snap-x snap-mandatory
             scrollbar-hide
+            sm:justify-center /* <--- ESTO CENTRA LOS BOTONES EN PC */
           "
           style={{
             WebkitOverflowScrolling: 'touch',
@@ -229,7 +232,7 @@ export default function Navigation({
                   className={`
                     shrink-0 snap-start
                     flex flex-col items-center
-                    gap-1 sm:gap-1.5
+                    gap-1.5
                     rounded-xl
                     px-2 sm:px-3
                     py-1.5 sm:py-2
@@ -306,7 +309,7 @@ export default function Navigation({
 
         </div>
 
-        {/* Indicadores laterales en móvil */}
+        {/* Indicadores laterales en móvil (no se ven en PC) */}
         <div
           className="
             pointer-events-none
@@ -478,14 +481,19 @@ export default function Navigation({
 
 
           {/* =====================================================
-              MARCAS
+              MARCAS (CORREGIDO PARA HOVER EN PC Y CLICK EN CELULAR)
               ===================================================== */}
 
           {marcasFiltradas.length > 0 && (
 
-            <div className="relative group ml-auto shrink-0">
+            <div 
+              className="relative group ml-auto shrink-0"
+              onMouseEnter={() => setMarcasMenuAbierto(true)}
+              onMouseLeave={() => setMarcasMenuAbierto(false)}
+            >
 
               <button
+                onClick={() => setMarcasMenuAbierto(!marcasMenuAbierto)}
                 className="
                   whitespace-nowrap
                   px-3 py-1
@@ -495,13 +503,14 @@ export default function Navigation({
                   hover:bg-[#F5F7FA]
                   rounded-full
                   transition-colors
+                  flex items-center gap-1
                 "
               >
-                Marcas ▼
+                Marcas <span className="text-[10px]">▼</span>
               </button>
 
 
-              <div className="absolute right-0 pt-1 hidden group-hover:block z-40">
+              <div className={`absolute right-0 pt-1 z-40 ${marcasMenuAbierto ? 'block' : 'hidden group-hover:block'}`}>
 
                 <div className="bg-white rounded-lg shadow-lg border border-[#E2E8F0] p-1 min-w-[140px]">
 
@@ -509,7 +518,7 @@ export default function Navigation({
 
                     <button
                       key={marca}
-                      onClick={() => onCategoriaChange?.(marca)}
+                      onClick={() => handleCategoriaClick(marca)}
                       className="
                         block
                         w-full
@@ -529,7 +538,7 @@ export default function Navigation({
 
 
                   <button
-                    onClick={() => onCategoriaChange?.('Todas')}
+                    onClick={() => handleCategoriaClick('Todas')}
                     className="
                       block
                       w-full
