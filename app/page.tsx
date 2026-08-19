@@ -157,7 +157,7 @@ export default function Home() {
   })
 
   const mensajesTicker = [
-    'Catálogo exclusivo para proveedores autorizados de Barberworld',
+    'Catálogo exclusivo para mayoristas autorizados de Barberworld',
     'Envíos a todo el país',
   ]
 
@@ -262,7 +262,7 @@ export default function Home() {
               </h1>
 
               <p className="text-[#64748B] text-xs mt-1 tracking-wide uppercase">
-                Catálogo de proveedores
+                Catálogo de mayoristas
               </p>
             </div>
           </div>
@@ -817,7 +817,7 @@ export default function Home() {
         </div>
 
         <div className="max-w-6xl mx-auto px-4 mt-6 pt-6 border-t border-white/10 text-white/50 text-xs text-center">
-          © {new Date().getFullYear()} Barberworld · Catálogo de proveedores
+          © {new Date().getFullYear()} Barberworld · Catálogo de mayoristas
         </div>
       </footer>
 
