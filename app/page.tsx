@@ -246,6 +246,7 @@ export default function Home() {
           .from('productos')
           .select('*')
           .eq('activo', true)
+          .order('imagen_url', { ascending: true, nullsFirst: false })
           .order('created_at', { ascending: false })
           .range(desde, desde + TAMANO - 1)
 
