@@ -20,14 +20,14 @@ const ICONOS_BOTONES: Record<string, string> = {
 }
 
 const SECCIONES = [
-  { id: 'electricos', nombre: 'Eléctricos', categorias: ['Peluqueras', 'Patilleras', 'Afeitadoras', 'Trimmers de Nariz', 'Secadores', 'Secadores y cepillo secador', 'Rizadoras, pinzas y conos', 'Planchas'] },
+  { id: 'electricos', nombre: 'Eléctricos', categorias: ['Peluqueras', 'Patilleras', 'Afeitadoras', 'Trimmers de Nariz', 'Secadores', 'Secadores y cepillo secador', 'Rizadoras, pinzas y conos', 'Planchas', 'Masajeadores y spa de pies'] },
   { id: 'manuales', nombre: 'Manuales', categorias: ['Tijeras', 'Barberas y Minoras', 'Cabezotes', 'Guias de Corte'] },
-  { id: 'cuidado', nombre: 'Cuidado y Estilizado', categorias: ['Ceras', 'Geles, balsamos y cremas de peinar', 'Lacas', 'Shampoos y Acondicionadores', 'Keratinas, serums y tratamientos capilares', 'Voluminizantes', 'Pigmentos, fibras, tintes y aerografos'] },
-  { id: 'aseo', nombre: 'Aseo y Protección', categorias: ['After Shave', 'Shaving Gel', 'Talcos', 'Cremas, exfoliantes y vaselinas', 'Mascarillas, velos y tratamientos faciales', 'Barba', 'Tatuajes'] },
-  { id: 'accesorios', nombre: 'Accesorios y Puesto', categorias: ['Capas', 'Cuelleros, toallas y paños', 'Atomizadores, pulverizadores y sprays', 'Brochas, talqueras y sacudidores', 'Peinillas', 'Cepillos', 'Tapetes, bases y puesto de trabajo', 'Caimanes, pinzas y sujetadores', 'Maletas, gorras y accesorios'] },
+  { id: 'cuidado', nombre: 'Cuidado y Estilizado', categorias: ['Ceras', 'Geles, balsamos y cremas de peinar', 'Lacas', 'Shampoos y Acondicionadores', 'Keratinas, serums y tratamientos capilares', 'Voluminizantes', 'Pigmentos, fibras, tintes y aerografos', 'Productos de estilizado'] },
+  { id: 'aseo', nombre: 'Aseo y Protección', categorias: ['After Shave', 'Shaving Gel', 'Talcos', 'Cremas, exfoliantes y vaselinas', 'Mascarillas, velos y tratamientos faciales', 'Barba', 'Tatuajes', 'Guantes, tapabocas y proteccion'] },
+  { id: 'accesorios', nombre: 'Accesorios y Puesto', categorias: ['Capas', 'Cuelleros, toallas y paños', 'Atomizadores, pulverizadores y sprays', 'Brochas, talqueras y sacudidores', 'Peinillas', 'Cepillos', 'Tapetes, bases y puesto de trabajo', 'Caimanes, pinzas y sujetadores', 'Maletas, gorras y accesorios', 'Mandiles'] },
   { id: 'repuestos', nombre: 'Repuestos y Mantenimiento', categorias: ['Repuestos', 'Lubricantes, Aceites y Mantenimiento'] },
   { id: 'combos', nombre: 'Combos y Kits', categorias: ['Combos'] },
-  { id: 'otros', nombre: 'Otros', categorias: ['Otros', 'Remates', 'Minoxidil', 'Ollas de cera y depilacion', 'Pulidores, drill y uñas', 'Cortadoras'] }
+  { id: 'otros', nombre: 'Otros', categorias: ['Otros', 'Remates', 'Minoxidil', 'Ollas de cera y depilacion', 'Pulidores, drill y uñas', 'Cortadoras', 'Mascotas', 'Productos para barbería'] }
 ]
 
 function Chevron({ abierto }: { abierto: boolean }) {
