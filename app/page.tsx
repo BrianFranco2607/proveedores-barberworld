@@ -266,38 +266,45 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
+    const normalizar = (t: string) =>
+      (t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+
     let filtrados = productos
 
     if (busqueda.trim()) {
-      const search = busqueda.toLowerCase().trim()
-      filtrados = filtrados.filter(p =>
-        p.nombre.toLowerCase().includes(search) ||
-        (p.categoria?.toLowerCase().includes(search)) ||
-        (p.marca?.toLowerCase().includes(search))
-      )
+      const q = normalizar(busqueda)
+      const terminos = q.split(/\s+/).filter(Boolean)
+      filtrados = filtrados.filter(p => {
+        const texto = normalizar(`${p.nombre} ${p.categoria || ''} ${p.marca || ''}`)
+        return terminos.every(t => texto.includes(t))
+      })
     }
 
     if (categoriaActiva !== 'Todas') {
-      const esMarca = productos.some(p => p.marca === categoriaActiva)
+      const botonAMarca: Record<string, string> = {
+        'OLD SCHOOL': 'Old School',
+        'STREET': 'Street',
+      }
 
-      if (esMarca) {
+      if (botonAMarca[categoriaActiva]) {
+        const marcaBuscada = normalizar(botonAMarca[categoriaActiva])
+        filtrados = filtrados.filter(p => normalizar(p.marca || '') === marcaBuscada)
+      } else if (productos.some(p => p.marca === categoriaActiva)) {
         filtrados = filtrados.filter(p => p.marca === categoriaActiva)
       } else {
-        const botonesRapidos = ['OLD SCHOOL', 'STREET', 'PELUQUERAS', 'AFEITADORAS', 'CERAS', 'PLANCHAS', 'SECADORES', 'TODA LA TIENDA']
-        if (botonesRapidos.includes(categoriaActiva)) {
-          const mapeo: Record<string, string[]> = {
-            'OLD SCHOOL': ['Old School'],
-            'STREET': ['Street'],
-            'PELUQUERAS': ['Peluqueras'],
-            'AFEITADORAS': ['Afeitadoras'],
-            'CERAS': ['Ceras'],
-            'PLANCHAS': ['Planchas'],
-            'SECADORES': ['Secadores y cepillo secador'],
-            'TODA LA TIENDA': []
-          }
-          const categoriasMapeadas = mapeo[categoriaActiva] || []
-          if (categoriasMapeadas.length > 0) {
-            filtrados = filtrados.filter(p => categoriasMapeadas.includes(p.categoria || ''))
+        const botonACategorias: Record<string, string[]> = {
+          'PELUQUERAS': ['Peluqueras'],
+          'AFEITADORAS': ['Afeitadoras'],
+          'CERAS': ['Ceras'],
+          'PLANCHAS': ['Planchas'],
+          'SECADORES': ['Secadores y cepillo secador'],
+          'TODA LA TIENDA': [],
+        }
+
+        if (categoriaActiva in botonACategorias) {
+          const cats = botonACategorias[categoriaActiva]
+          if (cats.length > 0) {
+            filtrados = filtrados.filter(p => cats.includes(p.categoria || ''))
           }
         } else {
           const grupos: Record<string, string[]> = {
@@ -308,18 +315,11 @@ export default function Home() {
             'Accesorios y Puesto': ['Capas', 'Cuelleros, toallas y paños', 'Atomizadores, pulverizadores y sprays', 'Brochas, talqueras y sacudidores', 'Peinillas', 'Cepillos', 'Tapetes, bases y puesto de trabajo', 'Caimanes, pinzas y sujetadores', 'Maletas, gorras y accesorios', 'Mandiles'],
             'Repuestos y Mantenimiento': ['Repuestos', 'Lubricantes, Aceites y Mantenimiento'],
             'Combos y Kits': ['Combos'],
-            'Otros': ['Otros', 'Remates', 'Minoxidil', 'Ollas de cera y depilacion', 'Pulidores, drill y uñas', 'Cortadoras', 'Mascotas', 'Productos para barbería']
+            'Otros': ['Otros', 'Remates', 'Minoxidil', 'Ollas de cera y depilacion', 'Pulidores, drill y uñas', 'Cortadoras', 'Mascotas', 'Productos para barbería'],
           }
 
-          const categoriasDelGrupo = Object.entries(grupos)
-            .filter(([grupo]) => grupo === categoriaActiva)
-            .flatMap(([, cats]) => cats)
-
-          if (categoriasDelGrupo.length > 0) {
-            filtrados = filtrados.filter(p => categoriasDelGrupo.includes(p.categoria || ''))
-          } else {
-            filtrados = filtrados.filter(p => p.categoria === categoriaActiva)
-          }
+          const categoriasDelGrupo = grupos[categoriaActiva] || [categoriaActiva]
+          filtrados = filtrados.filter(p => categoriasDelGrupo.includes(p.categoria || ''))
         }
       }
     }
