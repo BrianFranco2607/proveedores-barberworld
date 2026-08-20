@@ -54,7 +54,6 @@ export default function Navigation({
   const [marcasDropdownAbierto, setMarcasDropdownAbierto] = useState(false)
   const [seccionHover, setSeccionHover] = useState<string | null>(null)
 
-  // Estado del menú móvil
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false)
   const [seccionExpandida, setSeccionExpandida] = useState<string | null>(null)
   const [marcasExpandidas, setMarcasExpandidas] = useState(false)
@@ -65,20 +64,31 @@ export default function Navigation({
 
   useEffect(() => {
     async function cargarMarcas() {
-      const { data } = await supabase
-        .from('productos')
-        .select('marca')
-        .not('marca', 'is', null)
-        .not('marca', 'eq', '')
-      if (data) {
-        const marcasUnicas = [...new Set(data.map(p => p.marca))].filter(Boolean)
-        setMarcas(marcasUnicas.sort())
+      const TAMANO = 1000
+      let desde = 0
+      const acumulado: string[] = []
+
+      for (;;) {
+        const { data } = await supabase
+          .from('productos')
+          .select('marca')
+          .not('marca', 'is', null)
+          .not('marca', 'eq', '')
+          .range(desde, desde + TAMANO - 1)
+
+        if (!data || data.length === 0) break
+
+        acumulado.push(...data.map(p => p.marca).filter(Boolean))
+
+        if (data.length < TAMANO) break
+        desde += TAMANO
       }
+
+      setMarcas([...new Set(acumulado)].sort())
     }
     cargarMarcas()
   }, [])
 
-  // Bloquea el scroll del fondo cuando el menú móvil está abierto
   useEffect(() => {
     document.body.style.overflow = menuMovilAbierto ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
@@ -131,7 +141,6 @@ export default function Navigation({
   return (
     <div className="bg-white border-b border-[#E2E8F0] sticky top-0 z-40">
 
-      {/* BOTONES DE ACCESO RÁPIDO (todas las pantallas) */}
       <div className="relative border-b border-[#E2E8F0]">
         <div
           className="max-w-7xl mx-auto px-4 py-3 sm:py-5 flex items-center gap-3 sm:gap-5 md:gap-6 overflow-x-auto overflow-y-hidden flex-nowrap scroll-smooth snap-x snap-mandatory scrollbar-hide sm:justify-center"
@@ -159,7 +168,7 @@ export default function Navigation({
         </div>
       </div>
 
-      {/* ===== ESCRITORIO: secciones con hover (sin cambios) ===== */}
+      {/* ESCRITORIO */}
       <div className="hidden md:block max-w-7xl mx-auto px-4 py-2 relative">
         <div className="flex flex-nowrap items-center justify-between">
           <div className="flex flex-nowrap items-center gap-1 overflow-visible pb-2">
@@ -229,7 +238,7 @@ export default function Navigation({
         </div>
       </div>
 
-      {/* ===== MÓVIL: barra + panel con acordeones ===== */}
+      {/* MÓVIL */}
       <div className="md:hidden">
         <div className="flex items-center gap-2 px-4 py-2.5">
           <button
@@ -254,13 +263,11 @@ export default function Navigation({
         </div>
       </div>
 
-      {/* Overlay oscuro */}
       <div
         onClick={cerrarMenuMovil}
         className={`md:hidden fixed inset-0 z-50 bg-black/50 transition-opacity duration-300 ${menuMovilAbierto ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
       />
 
-      {/* Panel lateral */}
       <div
         className={`md:hidden fixed inset-y-0 left-0 z-50 flex w-[86%] max-w-sm flex-col bg-white shadow-2xl transition-transform duration-300 ${menuMovilAbierto ? 'translate-x-0' : '-translate-x-full'}`}
       >
