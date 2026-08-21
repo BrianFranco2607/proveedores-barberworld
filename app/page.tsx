@@ -125,7 +125,7 @@ function ProductCard({
         className="flex-1 cursor-pointer text-left"
         aria-label={`Ver detalles de ${producto.nombre}`}
       >
-        <div className="relative aspect-square overflow-hidden bg-[#F5F7FA]">
+        <div className="relative aspect-square overflow-hidden bg-white">
           {nuevo && (
             <span className="absolute left-2.5 top-2.5 z-10 rounded-full bg-[#12283F] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-white shadow-sm">
               Nuevo
@@ -137,7 +137,7 @@ function ProductCard({
               src={producto.imagen_url}
               alt={producto.nombre}
               loading="lazy"
-              className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
+              className="h-full w-full object-contain p-2 transition-transform duration-500 ease-out group-hover:scale-[1.04]"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-[11px] font-medium uppercase tracking-wide text-[#A8B3C1]">
